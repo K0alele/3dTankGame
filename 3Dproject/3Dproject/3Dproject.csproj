@@ -65,7 +65,7 @@
     <Content Include="Content\Hmap2.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\textura.jpg">
+    <Content Include="Content\TerrainTexture1.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="OpenTK.dll.config">

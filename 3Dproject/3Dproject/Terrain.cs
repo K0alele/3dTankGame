@@ -29,7 +29,7 @@ namespace _3Dproject
         Vector3 position = Vector3.Zero;
 
         short[] index;
-        VertexPositionColor[] vertices;
+        VertexPositionColorTexture[] vertices;
 
         int[,] HeightData;
         
@@ -44,7 +44,7 @@ namespace _3Dproject
         {            
             effect = new BasicEffect(device);
 
-            texture = content.Load<Texture2D>("textura");
+            texture = content.Load<Texture2D>("TerrainTexture1");
 
             float aspectRatio = (float)(device.Viewport.Width /
             device.Viewport.Height);
@@ -55,8 +55,9 @@ namespace _3Dproject
             MathHelper.ToRadians(45.0f),
             device.Viewport.AspectRatio, 1.0f, 500f);
             effect.LightingEnabled = false;
-            effect.VertexColorEnabled = true;           
-
+            effect.VertexColorEnabled = true;
+            effect.TextureEnabled = true;
+            effect.Texture = texture;
             worldMatrix = Matrix.Identity;
             // Cria os eixos 3D          
 
@@ -142,13 +143,15 @@ namespace _3Dproject
 
         private void CreateGeometry(GraphicsDevice device)
         {
-            vertices = new VertexPositionColor[Width * Height];
+            vertices = new VertexPositionColorTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
                 for (int z = 0; z < Height; z++)
                 {                                                                    
-                    vertices[x + z * Width] = new VertexPositionColor(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z), new Color(HeightData[x,z], HeightData[x, z], HeightData[x,z]));
+                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z)
+                        , new Color(HeightData[x,z], HeightData[x, z]
+                        , HeightData[x,z]),new Vector2((float)x / 30f, (float)z / 30f));
                 }                
             }
 
@@ -192,8 +195,8 @@ namespace _3Dproject
             //        count++;
             //    }
             //}
-            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColor), vertices.Length, BufferUsage.None);
-            vertexBuffer.SetData<VertexPositionColor>(vertices);
+            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorTexture), vertices.Length, BufferUsage.None);
+            vertexBuffer.SetData<VertexPositionColorTexture>(vertices);
             indexBuffer = new IndexBuffer(device, typeof(short), index.Length, BufferUsage.None);
             indexBuffer.SetData<short>(index);
         }
