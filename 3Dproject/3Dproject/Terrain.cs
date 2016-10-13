@@ -1,0 +1,209 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace _3Dproject
+{
+    class Terrain
+    {
+        BasicEffect effect;
+        public Matrix worldMatrix;
+
+        float axisLenght = 1f;
+        int vertexCount = 6;
+        float altura = 1;
+        int nlados = 0;
+        float raio = 1f;
+        private float YSCALE = 0f, yaw = 0;
+
+        VertexBuffer vertexBuffer;
+        IndexBuffer indexBuffer;
+        Vector4 add = Vector4.Zero;
+
+        Vector3 position = Vector3.Zero;
+
+        short[] index;
+        VertexPositionColor[] vertices;
+
+        int[,] HeightData;
+        
+        int Width = 0;
+        int Height = 0;
+
+        Vector3 viewPos = new Vector3(4f, 10f, -5.0f);        
+
+        public Terrain(GraphicsDevice device, ContentManager content , float _yScale)
+        {            
+            effect = new BasicEffect(device);                                                                     
+
+            float aspectRatio = (float)(device.Viewport.Width /
+            device.Viewport.Height);
+            effect.View = Matrix.CreateLookAt(
+            viewPos,
+            new Vector3(0, 5, 0), Vector3.Up);
+            effect.Projection = Matrix.CreatePerspectiveFieldOfView(
+            MathHelper.ToRadians(45.0f),
+            device.Viewport.AspectRatio, 1.0f, 500f);
+            effect.LightingEnabled = false;
+            effect.VertexColorEnabled = true;           
+
+            worldMatrix = Matrix.Identity;
+            // Cria os eixos 3D          
+
+            YSCALE = _yScale;
+
+            CreateHightMap(content);
+            CreateGeometry(device);      
+        }
+              
+        public void Update()
+        {
+            //KeyboardState keyboardState = Keyboard.GetState();
+
+            //if (keyboardState.IsKeyDown(Keys.Up))
+            //    add.Z += 0.2f;
+            //if (keyboardState.IsKeyDown(Keys.Down))
+            //    add.Z -= 0.2f;
+            //if (keyboardState.IsKeyDown(Keys.Left))
+            //    add.X -= 2f;
+            //if (keyboardState.IsKeyDown(Keys.Right))
+            //    add.X += 2f;
+            //if (keyboardState.IsKeyDown(Keys.W))
+            //    add.Y -= 0.2f;
+            //if (keyboardState.IsKeyDown(Keys.S))
+            //    add.Y += 0.2f;
+            //if (keyboardState.IsKeyDown(Keys.Z))
+            //    add.W += 2f;
+            //if (keyboardState.IsKeyDown(Keys.X))
+            //    add.W -= 2f;
+
+            //worldMatrix = Matrix.CreateScale(0.5f)
+            //    * Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(add.X), MathHelper.ToRadians(add.W), 0)
+            //    * Matrix.CreateTranslation(new Vector3(0, add.Y, add.Z));
+
+            ////KeyboardState keyboardState = Keyboard.GetState();
+
+            ////float speed = 0.5f;
+            ////if (keyboardState.IsKeyDown(Keys.W))
+            ////{
+            ////    position.X += (float)Math.Cos(yaw) * speed;
+            ////    position.Z += -(float)Math.Sin(yaw) * speed;
+            ////}
+            ////if (keyboardState.IsKeyDown(Keys.S))
+            ////{
+            ////    position.X -= (float)Math.Cos(yaw) * speed;
+            ////    position.Z -= -(float)Math.Sin(yaw) * speed;
+            ////}
+            ////if (keyboardState.IsKeyDown(Keys.Z))            
+            ////    position.Y += 2f;            
+            ////if (keyboardState.IsKeyDown(Keys.X))            
+            ////    position.Y -= 2f;            
+            ////if (keyboardState.IsKeyDown(Keys.A))
+            ////    yaw -= 0.1f;
+            ////if (keyboardState.IsKeyDown(Keys.D))
+            ////    yaw += 0.1f;
+
+            ////worldMatrix = Matrix.CreateScale(0.5f)
+            ////    * Matrix.CreateRotationY(yaw)
+            ////    * Matrix.CreateTranslation(position);
+        }
+
+        private void CreateHightMap(ContentManager content)
+        {
+            Texture2D YTexture = content.Load<Texture2D>("Hmap");
+
+            Color[] colorArray = new Color[YTexture.Width * YTexture.Height];
+            YTexture.GetData(colorArray);
+
+            HeightData = new int[YTexture.Width, YTexture.Height];
+
+            Width = YTexture.Width;
+            Height = YTexture.Height;
+
+            for (int x = 0; x < YTexture.Width; x++)
+            {
+                for (int y = 0; y < YTexture.Height; y++)
+                {
+                    HeightData[x, y] = colorArray[x + y * YTexture.Width].R;
+                }
+            }
+
+        }
+
+        private void CreateGeometry(GraphicsDevice device)
+        {
+            vertices = new VertexPositionColor[Width * Height];
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int z = 0; z < Height; z++)
+                {                                                                    
+                    vertices[x + z * Width] = new VertexPositionColor(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z), new Color(HeightData[x,z], HeightData[x, z], HeightData[x,z]));
+                }                
+            }
+
+            index = new short[((Width - 1) * (Height - 1)) * 6];
+
+            int count = 0;
+            for (int x = 0; x < Width - 1; x++)
+            {
+                for (int y = 0; y < Height - 1; y++)
+                {
+                    int botom = y % Width + Height * (x + 1);
+                    int top = botom - Height;
+                    int botom2 = (y + 1) % Width + Height * (x + 1);
+                    int top2 = botom2 - Height;
+
+                    index[count] = (short)botom;
+                    count++;
+                    index[count] = (short)top;
+                    count++;
+                    index[count] = (short)botom2;
+                    count++;
+                    index[count] = (short)botom2;
+                    count++;
+                    index[count] = (short)top;
+                    count++;
+                    index[count] = (short)top2;
+                    count++;
+                }
+            }           
+            //for (int x = 0; x < Width - 1; x++)
+            //{
+            //    for (int y = 0; y < Height - 1; y++)
+            //    {
+            //        int botom = y % Width + Height * (x + 1);
+            //        int top = botom - Height;
+
+            //        index[count] = (short)botom;
+            //        count++;
+            //        index[count] = (short)top;
+            //        count++;
+            //    }
+            //}
+            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColor), vertices.Length, BufferUsage.None);
+            vertexBuffer.SetData<VertexPositionColor>(vertices);
+            indexBuffer = new IndexBuffer(device, typeof(short), index.Length, BufferUsage.None);
+            indexBuffer.SetData<short>(index);
+        }
+
+        public void Draw(GraphicsDevice device)
+        {
+            // World Matrix
+            effect.World = worldMatrix;
+            effect.View = Game1.MainCamera.viewMatrix;
+            effect.Projection = Game1.MainCamera.projectionMatrix;
+            // Indica o efeito para desenhar os eixos
+            effect.CurrentTechnique.Passes[0].Apply();
+            device.SetVertexBuffer(vertexBuffer);
+            device.Indices = indexBuffer;                        
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount - 1);         
+        }
+    }
+}

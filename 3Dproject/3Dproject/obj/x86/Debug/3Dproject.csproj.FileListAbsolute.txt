@@ -1,0 +1,12 @@
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\OpenTK.dll.config
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\3Dproject.exe
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\3Dproject.pdb
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\MonoGame.Framework.dll
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\NVorbis.dll
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\OpenTK.dll
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\obj\x86\Debug\3Dproject.csprojResolveAssemblyReference.cache
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\obj\x86\Debug\3Dproject.exe
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\obj\x86\Debug\3Dproject.pdb
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\textura.jpg
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap.jpg
+C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap2.jpg
