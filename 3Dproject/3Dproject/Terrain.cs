@@ -36,11 +36,15 @@ namespace _3Dproject
         int Width = 0;
         int Height = 0;
 
-        Vector3 viewPos = new Vector3(4f, 10f, -5.0f);        
+        Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
+
+        Texture2D texture;
 
         public Terrain(GraphicsDevice device, ContentManager content , float _yScale)
         {            
-            effect = new BasicEffect(device);                                                                     
+            effect = new BasicEffect(device);
+
+            texture = content.Load<Texture2D>("textura");
 
             float aspectRatio = (float)(device.Viewport.Width /
             device.Viewport.Height);
@@ -151,29 +155,30 @@ namespace _3Dproject
             index = new short[((Width - 1) * (Height - 1)) * 6];
 
             int count = 0;
-            for (int x = 0; x < Width - 1; x++)
+            for (int y = 0; y < Height - 1; y++)
             {
-                for (int y = 0; y < Height - 1; y++)
+                for (int x = 0; x < Width - 1; x++)
                 {
-                    int botom = y % Width + Height * (x + 1);
-                    int top = botom - Height;
-                    int botom2 = (y + 1) % Width + Height * (x + 1);
-                    int top2 = botom2 - Height;
+                    int botomL = x + y * Width;
+                    int topL = (x + 1) + y * Width;
+                    int botomR = x + (y + 1) * Width;
+                    int topR = (x + 1) + (y + 1) * Width;
 
-                    index[count] = (short)botom;
+                    index[count] = (short)botomL;
                     count++;
-                    index[count] = (short)top;
+                    index[count] = (short)topL;
                     count++;
-                    index[count] = (short)botom2;
+                    index[count] = (short)botomR;
                     count++;
-                    index[count] = (short)botom2;
+                    index[count] = (short)botomR;
                     count++;
-                    index[count] = (short)top;
+                    index[count] = (short)topL;
                     count++;
-                    index[count] = (short)top2;
+                    index[count] = (short)topR;
                     count++;
                 }
-            }           
+            }
+                      
             //for (int x = 0; x < Width - 1; x++)
             //{
             //    for (int y = 0; y < Height - 1; y++)
@@ -203,7 +208,7 @@ namespace _3Dproject
             effect.CurrentTechnique.Passes[0].Apply();
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;                        
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount - 1);         
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount/3);         
         }
     }
 }
