@@ -10,31 +10,20 @@ using System.Threading.Tasks;
 
 namespace _3Dproject
 {
-    class Terrain
+    public class Terrain
     {
         BasicEffect effect;
-        public Matrix worldMatrix;
-
-        float axisLenght = 1f;
-        int vertexCount = 6;
-        float altura = 1;
-        int nlados = 0;
-        float raio = 1f;
-        private float YSCALE = 0f, yaw = 0;
-
+        Matrix worldMatrix;
+               
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
         Vector4 add = Vector4.Zero;
 
-        Vector3 position = Vector3.Zero;
-
-        short[] index;
-        VertexPositionColorTexture[] vertices;
-
-        int[,] HeightData;
+        Vector3 position = Vector3.Zero;                        
         
-        int Width = 0;
-        int Height = 0;
+        public int Width = 0;
+        public int Height = 0;
+        private float YSCALE = 0f, yaw = 0;
 
         Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
 
@@ -62,11 +51,16 @@ namespace _3Dproject
             // Cria os eixos 3D          
 
             YSCALE = _yScale;
-
-            CreateHightMap(content);
-            CreateGeometry(device);      
+            
+            CreateGeometry(device, content);      
         }
-              
+           
+        public int[] RetWidthAndHeight()
+        {
+            int[] aux = {Width , Height};
+            return aux;
+        }
+           
         public void Update()
         {
             //KeyboardState keyboardState = Keyboard.GetState();
@@ -118,15 +112,15 @@ namespace _3Dproject
             ////    * Matrix.CreateRotationY(yaw)
             ////    * Matrix.CreateTranslation(position);
         }
-
-        private void CreateHightMap(ContentManager content)
+        
+        private int[,] CreateHightMap(ContentManager content)
         {
             Texture2D YTexture = content.Load<Texture2D>("Hmap");
 
             Color[] colorArray = new Color[YTexture.Width * YTexture.Height];
             YTexture.GetData(colorArray);
 
-            HeightData = new int[YTexture.Width, YTexture.Height];
+            int[,] hData = new int[YTexture.Width, YTexture.Height];
 
             Width = YTexture.Width;
             Height = YTexture.Height;
@@ -135,27 +129,29 @@ namespace _3Dproject
             {
                 for (int y = 0; y < YTexture.Height; y++)
                 {
-                    HeightData[x, y] = colorArray[x + y * YTexture.Width].R;
+                    hData[x, y] = colorArray[x + y * YTexture.Width].R;
                 }
             }
-
+            return hData;
         }
 
-        private void CreateGeometry(GraphicsDevice device)
+        private void CreateGeometry(GraphicsDevice device, ContentManager content)
         {
-            vertices = new VertexPositionColorTexture[Width * Height];
+            int[,] HeightData = CreateHightMap(content);
+
+            VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
                 for (int z = 0; z < Height; z++)
                 {                                                                    
-                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z)
+                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(-x, (float)HeightData[x, z]/ YSCALE, -z)
                         , new Color(HeightData[x,z], HeightData[x, z]
                         , HeightData[x,z]),new Vector2((float)x / 30f, (float)z / 30f));
                 }                
             }
 
-            index = new short[((Width - 1) * (Height - 1)) * 6];
+            short[] index = new short[((Width - 1) * (Height - 1)) * 6];
 
             int count = 0;
             for (int y = 0; y < Height - 1; y++)
@@ -180,8 +176,7 @@ namespace _3Dproject
                     index[count] = (short)topR;
                     count++;
                 }
-            }
-                      
+            }            
             //for (int x = 0; x < Width - 1; x++)
             //{
             //    for (int y = 0; y < Height - 1; y++)

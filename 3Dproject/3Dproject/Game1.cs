@@ -16,7 +16,7 @@ namespace _3Dproject
 
         Vector2 half;       
 
-        Terrain t;
+        public static Terrain t;
 
         public Game1()
         {
@@ -52,11 +52,11 @@ namespace _3Dproject
 
             MouseState mouseState = Mouse.GetState();
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
-           
-            MainCamera.Update(mousePos, half);
+
+            MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
             t.Update();
 
-            Debug.WriteLine("" + mousePos.X + "," + mousePos.Y);
+            //Debug.WriteLine("" + mousePos.X + "," + mousePos.Y);
             //LastMouseState = mouseState;
             Mouse.SetPosition((int)half.X, (int)half.Y);
             base.Update(gameTime);
