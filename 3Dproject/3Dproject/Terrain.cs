@@ -24,7 +24,7 @@ namespace _3Dproject
         public int Width = 0;
         public int Height = 0;
         private float YSCALE = 0f, yaw = 0;
-        int[,] HeightData;
+        float[,] HeightData;
 
         Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
 
@@ -121,7 +121,7 @@ namespace _3Dproject
             Color[] colorArray = new Color[YTexture.Width * YTexture.Height];
             YTexture.GetData(colorArray);
 
-            HeightData = new int[YTexture.Width, YTexture.Height];
+            HeightData = new float[YTexture.Width, YTexture.Height];
 
             Width = YTexture.Width;
             Height = YTexture.Height;
@@ -130,34 +130,34 @@ namespace _3Dproject
             {
                 for (int y = 0; y < YTexture.Height; y++)
                 {
-                    HeightData[x, y] = colorArray[x + y * YTexture.Width].R;
+                    HeightData[x, y] = colorArray[x + y * YTexture.Width].R / (YSCALE);
                 }
             }            
         }
 
-        public float retCameraHight(Vector3 P)
+        public float retCameraHeight(Vector3 P)
         {
-            //float UpLeft = HeightData[(int)P.X, (int)P.Z] / (YSCALE);
-            //float UpRight = HeightData[(int)P.X + 1, (int)P.Z] / (YSCALE);
-            //float BotLeft = HeightData[(int)P.X, (int)P.Z + 1] / (YSCALE);
-            //float BotRight = HeightData[(int)P.X + 1, (int)P.Z + 1] / (YSCALE);
+            float UpLeft = HeightData[(int)P.X, (int)P.Z];
+            float UpRight = HeightData[(int)P.X + 1, (int)P.Z];
+            float BotLeft = HeightData[(int)P.X, (int)P.Z + 1];
+            float BotRight = HeightData[(int)P.X + 1, (int)P.Z + 1];
 
-            //float distX = 1 - (P.X - (int)P.X);
-            //float distY = 1 - (P.Z - (int)P.Z);
+            float dX = 1 - (P.X - (int)P.X);
+            float dY = 1 - (P.Z - (int)P.Z);
 
-            //return distX*UpRight + distY*BotRight;
-            return HeightData[(int)P.X, (int)P.Z] / YSCALE;
+            return UpLeft * dX * dY + UpRight * dY * (1 - dX) + BotLeft * dX * (1 - dY) + BotRight * (1 - dX) * (1 - dY);
         }
-        VertexPositionColorTexture[] vertices;
+       
         private void CreateGeometry(GraphicsDevice device)
-        {                    
+        {
+            VertexPositionColorTexture[] vertices;
             vertices = new VertexPositionColorTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
                 for (int z = 0; z < Height; z++)
                 {                                                                    
-                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z)
+                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z], z)
                         , new Color(HeightData[x,z], HeightData[x, z], HeightData[x,z]),
                         new Vector2((float)x / 30f, (float)z / 30f));
                 }                

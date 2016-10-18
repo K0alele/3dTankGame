@@ -35,36 +35,51 @@ namespace _3Dproject
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
+            yaw += (currPos.X - HalfHalf.X) * scale / 20;
+            pitch += (currPos.Y - HalfHalf.Y) * scale / 20;
+
             if (keyboardState.IsKeyDown(Keys.W))
-                add.Z += 0.2f;
+            {
+                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+                add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch));
+                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+            }
+
             if (keyboardState.IsKeyDown(Keys.S))
-                add.Z -= 0.2f;
+            {
+                add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+                add.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch));
+                add.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+            }
             if (keyboardState.IsKeyDown(Keys.A))
-                add.X += 0.2f;
+            {
+                add.X += .5f*(float)Math.Cos(MathHelper.ToRadians(yaw - 90));
+                add.Z += .5f*(float)Math.Sin(MathHelper.ToRadians(yaw - 90));
+            }
             if (keyboardState.IsKeyDown(Keys.D))
-                add.X -= 0.2f;
+            {
+                add.X += .5f*(float)Math.Cos(MathHelper.ToRadians(yaw + 90));
+                add.Z += .5f*(float)Math.Sin(MathHelper.ToRadians(yaw + 90));
+            }
 
             if (scrollValue < PrevScrollWeelValue)
                 add.Y -= 0.8f;
             if (scrollValue > PrevScrollWeelValue)
                 add.Y += 0.8f;
-
-            yaw += (currPos.X - HalfHalf.X) * scale / 20;
-            pitch += (currPos.Y - HalfHalf.Y) * scale / 20;            
+     
 
             pitch = MathHelper.Clamp(pitch, -90, 90);
-            add.X = MathHelper.Clamp(add.X,0,(Game1.t.Width -2));
-            add.Z = MathHelper.Clamp(add.Z,0,(Game1.t.Height -2));
+            add.X = MathHelper.Clamp(add.X,0,(Game1.t.Width - 2));
+            add.Z = MathHelper.Clamp(add.Z,0,(Game1.t.Height - 2));
 
-            aux = Game1.t.retCameraHight(add);
-            add.Y = MathHelper.Clamp(add.Y, aux + HeightOffset, 60);            
-
+            aux = Game1.t.retCameraHeight(add);
+            add.Y = aux + 4;
             viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
                 * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
                 * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
 
             PrevScrollWeelValue = scrollValue;
-            Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + aux + "-" + add.Y + "\n TARGUET ("+ cameraTarguet.X+"|"+ cameraTarguet.Y+"|"+cameraTarguet.Z +")");
+            Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + aux + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
         }
 
     }
