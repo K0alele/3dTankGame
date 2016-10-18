@@ -12,9 +12,12 @@ namespace _3Dproject
 {
     public class Camera
     {
+        private int CameraId = 1;
+        private float[] CameraSpeed = { 0.5f, 0.4f};
         int PrevScrollWeelValue = 0;
         float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
-        float HeightOffset = 2f, aux = 0;
+        float HeightOffset = 8f;
+        bool canPress = true;
         Vector3 position, cameraTarguet,add = new Vector3(10,0,10);
 
         public Matrix viewMatrix, projectionMatrix;        
@@ -40,46 +43,68 @@ namespace _3Dproject
 
             if (keyboardState.IsKeyDown(Keys.W))
             {
-                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
-                add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch));
-                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
+                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
             }
 
             if (keyboardState.IsKeyDown(Keys.S))
             {
-                add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
-                add.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch));
-                add.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch));
+                add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                add.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
+                add.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
             }
             if (keyboardState.IsKeyDown(Keys.A))
             {
-                add.X += .5f*(float)Math.Cos(MathHelper.ToRadians(yaw - 90));
-                add.Z += .5f*(float)Math.Sin(MathHelper.ToRadians(yaw - 90));
+                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
+                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
             }
             if (keyboardState.IsKeyDown(Keys.D))
             {
-                add.X += .5f*(float)Math.Cos(MathHelper.ToRadians(yaw + 90));
-                add.Z += .5f*(float)Math.Sin(MathHelper.ToRadians(yaw + 90));
+                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
+                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
             }
 
-            if (scrollValue < PrevScrollWeelValue)
-                add.Y -= 0.8f;
-            if (scrollValue > PrevScrollWeelValue)
-                add.Y += 0.8f;
-     
+            if (keyboardState.IsKeyDown(Keys.Space) && canPress)
+            {
+                CameraId = NextCamera(CameraId);
+                canPress = false;
+            }
+            else if (!keyboardState.IsKeyDown(Keys.Space))            
+                canPress = true;
 
             pitch = MathHelper.Clamp(pitch, -90, 90);
-            add.X = MathHelper.Clamp(add.X,0,(Game1.t.Width - 2));
-            add.Z = MathHelper.Clamp(add.Z,0,(Game1.t.Height - 2));
+            add.X = MathHelper.Clamp(add.X, 0, (Game1.t.Width - 2));
+            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.t.Height - 2));
 
-            aux = Game1.t.retCameraHeight(add);
-            add.Y = aux + 4;
+            float minHeight = Game1.t.retCameraHeight(add);
+
+            if (CameraId == 1)
+            {
+                
+                add.Y = minHeight + HeightOffset;
+            }
+            else if (CameraId == 2)
+            {
+                if (scrollValue < PrevScrollWeelValue)
+                    add.Y -= 1f;
+                if (scrollValue > PrevScrollWeelValue)
+                    add.Y += 1f;
+
+                add.Y = MathHelper.Clamp(add.Y, minHeight + HeightOffset, 100);
+            }                                   
+            
             viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
                 * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
                 * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
 
             PrevScrollWeelValue = scrollValue;
-            Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + aux + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
+            Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + minHeight + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
+        }
+        private int NextCamera( int _id)
+        {
+            if (_id == 2) return 1;
+            return _id + 1;
         }
 
     }

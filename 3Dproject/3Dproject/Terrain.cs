@@ -26,6 +26,8 @@ namespace _3Dproject
         private float YSCALE = 0f, yaw = 0;
         float[,] HeightData;
 
+        VertexPositionNormalTexture[] vertices;
+
         Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
 
         Texture2D texture;
@@ -48,6 +50,10 @@ namespace _3Dproject
             effect.VertexColorEnabled = true;
             effect.TextureEnabled = true;
             effect.Texture = texture;
+            effect.LightingEnabled = true;
+            effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
+            effect.DirectionalLight0.Direction = new Vector3(0.5f, -0.8f, 0);
+            //effect.DirectionalLight0.SpecularColor = new Vector3(0f, 0f, 0f);
             worldMatrix = Matrix.Identity;          
 
             YSCALE = _yScale;
@@ -60,60 +66,8 @@ namespace _3Dproject
         {
             int[] aux = {Width , Height};
             return aux;
-        }
-           
-        public void Update()
-        {
-            //KeyboardState keyboardState = Keyboard.GetState();
-
-            //if (keyboardState.IsKeyDown(Keys.Up))
-            //    add.Z += 0.2f;
-            //if (keyboardState.IsKeyDown(Keys.Down))
-            //    add.Z -= 0.2f;
-            //if (keyboardState.IsKeyDown(Keys.Left))
-            //    add.X -= 2f;
-            //if (keyboardState.IsKeyDown(Keys.Right))
-            //    add.X += 2f;
-            //if (keyboardState.IsKeyDown(Keys.W))
-            //    add.Y -= 0.2f;
-            //if (keyboardState.IsKeyDown(Keys.S))
-            //    add.Y += 0.2f;
-            //if (keyboardState.IsKeyDown(Keys.Z))
-            //    add.W += 2f;
-            //if (keyboardState.IsKeyDown(Keys.X))
-            //    add.W -= 2f;
-
-            //worldMatrix = Matrix.CreateScale(0.5f)
-            //    * Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(add.X), MathHelper.ToRadians(add.W), 0)
-            //    * Matrix.CreateTranslation(new Vector3(0, add.Y, add.Z));
-
-            ////KeyboardState keyboardState = Keyboard.GetState();
-
-            ////float speed = 0.5f;
-            ////if (keyboardState.IsKeyDown(Keys.W))
-            ////{
-            ////    position.X += (float)Math.Cos(yaw) * speed;
-            ////    position.Z += -(float)Math.Sin(yaw) * speed;
-            ////}
-            ////if (keyboardState.IsKeyDown(Keys.S))
-            ////{
-            ////    position.X -= (float)Math.Cos(yaw) * speed;
-            ////    position.Z -= -(float)Math.Sin(yaw) * speed;
-            ////}
-            ////if (keyboardState.IsKeyDown(Keys.Z))            
-            ////    position.Y += 2f;            
-            ////if (keyboardState.IsKeyDown(Keys.X))            
-            ////    position.Y -= 2f;            
-            ////if (keyboardState.IsKeyDown(Keys.A))
-            ////    yaw -= 0.1f;
-            ////if (keyboardState.IsKeyDown(Keys.D))
-            ////    yaw += 0.1f;
-
-            ////worldMatrix = Matrix.CreateScale(0.5f)
-            ////    * Matrix.CreateRotationY(yaw)
-            ////    * Matrix.CreateTranslation(position);
-        }
-        
+        } 
+                
         private void CreateHightMap(ContentManager content)
         {
             Texture2D YTexture = content.Load<Texture2D>("Hmap");
@@ -150,15 +104,16 @@ namespace _3Dproject
        
         private void CreateGeometry(GraphicsDevice device)
         {
-            VertexPositionColorTexture[] vertices;
-            vertices = new VertexPositionColorTexture[Width * Height];
+
+            vertices = new VertexPositionNormalTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
                 for (int z = 0; z < Height; z++)
-                {                                                                    
-                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z], z)
-                        , new Color(HeightData[x,z], HeightData[x, z], HeightData[x,z]),
+                {
+
+                    vertices[x + z * Width] = new VertexPositionNormalTexture(new Vector3(x, (float)HeightData[x, z], z)
+                        , Vector3.Zero,
                         new Vector2((float)x / 30f, (float)z / 30f));
                 }                
             }
@@ -188,25 +143,29 @@ namespace _3Dproject
                     index[count] = (short)topR;
                     count++;
                 }
-            }            
-            //for (int x = 0; x < Width - 1; x++)
-            //{
-            //    for (int y = 0; y < Height - 1; y++)
-            //    {
-            //        int botom = y % Width + Height * (x + 1);
-            //        int top = botom - Height;
+            }
 
-            //        index[count] = (short)botom;
-            //        count++;
-            //        index[count] = (short)top;
-            //        count++;
-            //    }
-            //}
-            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorTexture), vertices.Length, BufferUsage.None);
-            vertexBuffer.SetData<VertexPositionColorTexture>(vertices);
+            for (int i = 0; i < index.Length/3 - 1; i++)
+            {
+                int id1 = index[3 * i];
+                int id2 = index[3 * i + 1];
+                int id3 = index[3 * i + 2];
+
+                Vector3 upLenght = vertices[id1].Position - vertices[id3].Position;
+                Vector3 downLength = vertices[id1].Position - vertices[id2].Position;
+                Vector3 normal = Vector3.Cross(upLenght, downLength);
+                normal.Normalize();
+
+                vertices[id1].Normal = normal;
+                vertices[id2].Normal = normal;
+                vertices[id3].Normal = normal;
+            }
+
+            vertexBuffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.None);
+            vertexBuffer.SetData<VertexPositionNormalTexture>(vertices);
             indexBuffer = new IndexBuffer(device, typeof(short), index.Length, BufferUsage.None);
             indexBuffer.SetData<short>(index);            
-            }
+       }
 
         public void Draw(GraphicsDevice device)
         {
