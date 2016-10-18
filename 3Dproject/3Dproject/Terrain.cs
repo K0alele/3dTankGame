@@ -24,6 +24,7 @@ namespace _3Dproject
         public int Width = 0;
         public int Height = 0;
         private float YSCALE = 0f, yaw = 0;
+        int[,] HeightData;
 
         Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
 
@@ -47,12 +48,12 @@ namespace _3Dproject
             effect.VertexColorEnabled = true;
             effect.TextureEnabled = true;
             effect.Texture = texture;
-            worldMatrix = Matrix.Identity;
-            // Cria os eixos 3D          
+            worldMatrix = Matrix.Identity;          
 
             YSCALE = _yScale;
-            
-            CreateGeometry(device, content);      
+
+            CreateHightMap(content);
+            CreateGeometry(device);      
         }
            
         public int[] RetWidthAndHeight()
@@ -113,14 +114,14 @@ namespace _3Dproject
             ////    * Matrix.CreateTranslation(position);
         }
         
-        private int[,] CreateHightMap(ContentManager content)
+        private void CreateHightMap(ContentManager content)
         {
             Texture2D YTexture = content.Load<Texture2D>("Hmap");
 
             Color[] colorArray = new Color[YTexture.Width * YTexture.Height];
             YTexture.GetData(colorArray);
 
-            int[,] hData = new int[YTexture.Width, YTexture.Height];
+            HeightData = new int[YTexture.Width, YTexture.Height];
 
             Width = YTexture.Width;
             Height = YTexture.Height;
@@ -129,25 +130,36 @@ namespace _3Dproject
             {
                 for (int y = 0; y < YTexture.Height; y++)
                 {
-                    hData[x, y] = colorArray[x + y * YTexture.Width].R;
+                    HeightData[x, y] = colorArray[x + y * YTexture.Width].R;
                 }
-            }
-            return hData;
+            }            
         }
 
-        private void CreateGeometry(GraphicsDevice device, ContentManager content)
+        public float retCameraHight(Vector3 P)
         {
-            int[,] HeightData = CreateHightMap(content);
+            //float UpLeft = HeightData[(int)P.X, (int)P.Z] / (YSCALE);
+            //float UpRight = HeightData[(int)P.X + 1, (int)P.Z] / (YSCALE);
+            //float BotLeft = HeightData[(int)P.X, (int)P.Z + 1] / (YSCALE);
+            //float BotRight = HeightData[(int)P.X + 1, (int)P.Z + 1] / (YSCALE);
 
-            VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[Width * Height];
+            //float distX = 1 - (P.X - (int)P.X);
+            //float distY = 1 - (P.Z - (int)P.Z);
+
+            //return distX*UpRight + distY*BotRight;
+            return HeightData[(int)P.X, (int)P.Z] / YSCALE;
+        }
+        VertexPositionColorTexture[] vertices;
+        private void CreateGeometry(GraphicsDevice device)
+        {                    
+            vertices = new VertexPositionColorTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
                 for (int z = 0; z < Height; z++)
                 {                                                                    
-                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(-x, (float)HeightData[x, z]/ YSCALE, -z)
-                        , new Color(HeightData[x,z], HeightData[x, z]
-                        , HeightData[x,z]),new Vector2((float)x / 30f, (float)z / 30f));
+                    vertices[x + z * Width] = new VertexPositionColorTexture(new Vector3(x, (float)HeightData[x, z]/ YSCALE, z)
+                        , new Color(HeightData[x,z], HeightData[x, z], HeightData[x,z]),
+                        new Vector2((float)x / 30f, (float)z / 30f));
                 }                
             }
 
@@ -193,12 +205,12 @@ namespace _3Dproject
             vertexBuffer = new VertexBuffer(device, typeof(VertexPositionColorTexture), vertices.Length, BufferUsage.None);
             vertexBuffer.SetData<VertexPositionColorTexture>(vertices);
             indexBuffer = new IndexBuffer(device, typeof(short), index.Length, BufferUsage.None);
-            indexBuffer.SetData<short>(index);
-        }
+            indexBuffer.SetData<short>(index);            
+            }
 
         public void Draw(GraphicsDevice device)
         {
-            // World Matrix
+            // World Matrix+            
             effect.World = worldMatrix;
             effect.View = Game1.MainCamera.viewMatrix;
             effect.Projection = Game1.MainCamera.projectionMatrix;

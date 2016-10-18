@@ -52,9 +52,9 @@ namespace _3Dproject
 
             MouseState mouseState = Mouse.GetState();
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
-
-            MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
+            
             t.Update();
+            MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
 
             //Debug.WriteLine("" + mousePos.X + "," + mousePos.Y);
             //LastMouseState = mouseState;
