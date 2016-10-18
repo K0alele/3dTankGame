@@ -47,7 +47,6 @@ namespace _3Dproject
                 add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
                 add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
             }
-
             if (keyboardState.IsKeyDown(Keys.S))
             {
                 add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
@@ -65,23 +64,34 @@ namespace _3Dproject
                 add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
             }
 
+            UpdateCameraHeight(keyboardState, scrollValue);
+
+            pitch = MathHelper.Clamp(pitch, -90, 90);
+            add.X = MathHelper.Clamp(add.X, 0, (Game1.t.Width - 2));
+            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.t.Height - 2));                      
+            
+            viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
+                * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
+
+            
+            //Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + minHeight + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
+        }
+        private void UpdateCameraHeight(KeyboardState keyboardState, int scrollValue)
+        {
+
             if (keyboardState.IsKeyDown(Keys.Space) && canPress)
             {
                 CameraId = NextCamera(CameraId);
                 canPress = false;
             }
-            else if (!keyboardState.IsKeyDown(Keys.Space))            
+            else if (!keyboardState.IsKeyDown(Keys.Space))
                 canPress = true;
-
-            pitch = MathHelper.Clamp(pitch, -90, 90);
-            add.X = MathHelper.Clamp(add.X, 0, (Game1.t.Width - 2));
-            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.t.Height - 2));
 
             float minHeight = Game1.t.retCameraHeight(add);
 
             if (CameraId == 1)
             {
-                
                 add.Y = minHeight + HeightOffset;
             }
             else if (CameraId == 2)
@@ -92,15 +102,10 @@ namespace _3Dproject
                     add.Y += 1f;
 
                 add.Y = MathHelper.Clamp(add.Y, minHeight + HeightOffset, 100);
-            }                                   
-            
-            viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
-                * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
-                * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
-
+            }
             PrevScrollWeelValue = scrollValue;
-            Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + minHeight + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
         }
+
         private int NextCamera( int _id)
         {
             if (_id == 2) return 1;

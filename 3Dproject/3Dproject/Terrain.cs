@@ -70,7 +70,7 @@ namespace _3Dproject
                 
         private void CreateHightMap(ContentManager content)
         {
-            Texture2D YTexture = content.Load<Texture2D>("Hmap");
+            Texture2D YTexture = content.Load<Texture2D>("Hmap1");
 
             Color[] colorArray = new Color[YTexture.Width * YTexture.Height];
             YTexture.GetData(colorArray);
@@ -170,7 +170,7 @@ namespace _3Dproject
         public void Draw(GraphicsDevice device)
         {
             // World Matrix+            
-            effect.World = worldMatrix;
+            effect.World =  worldMatrix;
             effect.View = Game1.MainCamera.viewMatrix;
             effect.Projection = Game1.MainCamera.projectionMatrix;
             // Indica o efeito para desenhar os eixos
