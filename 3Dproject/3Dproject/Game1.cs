@@ -29,7 +29,7 @@ namespace _3Dproject
 
             terrain = new Terrain(GraphicsDevice, Content, 10f);
 
-            this.IsMouseVisible = true;
+            this.IsMouseVisible = false;
             base.Initialize();
         }
 

@@ -16,7 +16,6 @@ namespace _3Dproject
         private float[] CameraSpeed = { 0.5f, 0.4f};
         float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
         float HeightOffset = 8f;
-        bool canPress = true;
         Vector3 position, cameraTarguet,add = new Vector3(10,0,10);
 
         Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
