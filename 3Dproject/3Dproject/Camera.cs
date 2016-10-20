@@ -12,13 +12,14 @@ namespace _3Dproject
 {
     public class Camera
     {
-        private int CameraId = 1;
+        private int CameraId = 0;
         private float[] CameraSpeed = { 0.5f, 0.4f};
-        int PrevScrollWeelValue = 0;
         float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
         float HeightOffset = 8f;
         bool canPress = true;
         Vector3 position, cameraTarguet,add = new Vector3(10,0,10);
+
+        Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
 
         public Matrix viewMatrix, projectionMatrix;        
 
@@ -34,41 +35,41 @@ namespace _3Dproject
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.3f, 1000.0f);
         }
 
-        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue)
+        public void Update(Vector2 currPos, Vector2 HalfHalf)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
             yaw += (currPos.X - HalfHalf.X) * scale / 20;
-            pitch += (currPos.Y - HalfHalf.Y) * scale / 20;
+            pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
 
-            if (keyboardState.IsKeyDown(Keys.W))
+            if (keyboardState.IsKeyDown(Keys.NumPad8))
             {
                 add.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
                 add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
                 add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
             }
-            if (keyboardState.IsKeyDown(Keys.S))
+            if (keyboardState.IsKeyDown(Keys.NumPad5))
             {
                 add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
                 add.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
                 add.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
             }
-            if (keyboardState.IsKeyDown(Keys.A))
+            if (keyboardState.IsKeyDown(Keys.NumPad4))
             {
                 add.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
                 add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
             }
-            if (keyboardState.IsKeyDown(Keys.D))
+            if (keyboardState.IsKeyDown(Keys.NumPad6))
             {
                 add.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
                 add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
             }
 
-            UpdateCameraHeight(keyboardState, scrollValue);
+            UpdateCameraHeight(keyboardState);
 
             pitch = MathHelper.Clamp(pitch, -90, 90);
-            add.X = MathHelper.Clamp(add.X, 0, (Game1.t.Width - 2));
-            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.t.Height - 2));                      
+            add.X = MathHelper.Clamp(add.X, 0, (Game1.terrain.Width - 2));
+            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.terrain.Height - 2));                      
             
             viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
                 * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
@@ -77,33 +78,34 @@ namespace _3Dproject
             
             //Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + minHeight + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
         }
-        private void UpdateCameraHeight(KeyboardState keyboardState, int scrollValue)
+        private void UpdateCameraHeight(KeyboardState keyboardState)
         {
-
-            if (keyboardState.IsKeyDown(Keys.Space) && canPress)
+            for (int i = 0; i < cameraKeys.Length; i++)
             {
-                CameraId = NextCamera(CameraId);
-                canPress = false;
-            }
-            else if (!keyboardState.IsKeyDown(Keys.Space))
-                canPress = true;
+                if (keyboardState.IsKeyDown(cameraKeys[i]))
+                {
+                    CameraId = i;
+                    break;
+                }
+            }            
 
-            float minHeight = Game1.t.retCameraHeight(add);
+            float minHeight = Game1.terrain.retCameraHeight(add);
 
-            if (CameraId == 1)
+            switch (CameraId)
             {
-                add.Y = minHeight + HeightOffset;
-            }
-            else if (CameraId == 2)
-            {
-                if (scrollValue < PrevScrollWeelValue)
-                    add.Y -= 1f;
-                if (scrollValue > PrevScrollWeelValue)
-                    add.Y += 1f;
-
-                add.Y = MathHelper.Clamp(add.Y, minHeight + HeightOffset, 100);
-            }
-            PrevScrollWeelValue = scrollValue;
+                case 0:
+                    add.Y = minHeight + HeightOffset;
+                    break;
+                case 1:
+                    if (keyboardState.IsKeyDown(Keys.NumPad1))
+                        add.Y -= 1f;
+                    if (keyboardState.IsKeyDown(Keys.NumPad7))
+                        add.Y += 1f;
+                    add.Y = MathHelper.Clamp(add.Y, minHeight + HeightOffset, 100);
+                    break;                
+                default:                    
+                    break;
+            }                   
         }
 
         private int NextCamera( int _id)
@@ -111,6 +113,5 @@ namespace _3Dproject
             if (_id == 2) return 1;
             return _id + 1;
         }
-
     }
 }

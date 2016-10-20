@@ -23,7 +23,7 @@ namespace _3Dproject
         
         public int Width = 0;
         public int Height = 0;
-        private float YSCALE = 0f, yaw = 0;
+        private float YSCALE = 0f;
         float[,] HeightData;
 
         VertexPositionNormalTexture[] vertices;
@@ -145,7 +145,7 @@ namespace _3Dproject
                 }
             }
 
-            for (int i = 0; i < index.Length/3 - 1; i++)
+            for (int i = 0; i < index.Length/3; i++)
             {
                 int id1 = index[3 * i];
                 int id2 = index[3 * i + 1];

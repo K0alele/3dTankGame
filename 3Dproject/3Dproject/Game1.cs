@@ -12,11 +12,9 @@ namespace _3Dproject
         SpriteBatch spriteBatch;
         
         public static Camera MainCamera;
-        MouseState LastMouseState = new MouseState();
+        public static Terrain terrain;
 
-        Vector2 half;       
-
-        public static Terrain t;
+        Vector2 half;               
 
         public Game1()
         {
@@ -29,7 +27,7 @@ namespace _3Dproject
             MainCamera = new Camera(GraphicsDevice);            
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
-            t = new Terrain(GraphicsDevice, Content, 10f);
+            terrain = new Terrain(GraphicsDevice, Content, 10f);
 
             this.IsMouseVisible = true;
             base.Initialize();
@@ -52,12 +50,10 @@ namespace _3Dproject
 
             MouseState mouseState = Mouse.GetState();
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
-            
-            //t.Update();
-            MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
+                       
+            MainCamera.Update(mousePos, half);
 
             //Debug.WriteLine("" + mousePos.X + "," + mousePos.Y);
-            //LastMouseState = mouseState;
             Mouse.SetPosition((int)half.X, (int)half.Y);
             base.Update(gameTime);
             
@@ -67,7 +63,7 @@ namespace _3Dproject
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            t.Draw(GraphicsDevice);
+            terrain.Draw(GraphicsDevice);
 
             base.Draw(gameTime);
         }
