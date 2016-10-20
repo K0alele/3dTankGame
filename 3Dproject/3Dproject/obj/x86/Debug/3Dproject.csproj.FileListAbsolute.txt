@@ -12,7 +12,6 @@ C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\Des
 C:\Users\Diogo\documents\visual studio 2015\Projects\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap2.jpg
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\obj\x86\Debug\3Dproject.exe
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\obj\x86\Debug\3Dproject.pdb
-C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap2.jpg
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\OpenTK.dll.config
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\3Dproject.exe
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\3Dproject.pdb
