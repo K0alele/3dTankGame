@@ -52,8 +52,7 @@ namespace _3Dproject
             Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
                        
             MainCamera.Update(mousePos, half);
-
-            //Debug.WriteLine("" + mousePos.X + "," + mousePos.Y);
+            
             Mouse.SetPosition((int)half.X, (int)half.Y);
             base.Update(gameTime);
             

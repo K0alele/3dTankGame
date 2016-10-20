@@ -16,7 +16,7 @@ namespace _3Dproject
         private float[] CameraSpeed = { 0.5f, 0.4f};
         float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
         float HeightOffset = 8f;
-        Vector3 position, cameraTarguet,add = new Vector3(10,0,10);
+        Vector3 cameraTarguet, pos;
 
         Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
 
@@ -24,9 +24,9 @@ namespace _3Dproject
 
         public Camera(GraphicsDevice device)
         {
-            position = new Vector3(0, 60, -10);
-            cameraTarguet = new Vector3(10, 0, 0);
-            viewMatrix = Matrix.CreateLookAt(position,cameraTarguet, Vector3.Up);
+            pos = new Vector3(10, 0, 10);
+            cameraTarguet = new Vector3(10, 0, 10);
+            viewMatrix = Matrix.CreateLookAt(pos,pos+cameraTarguet, Vector3.Up);
 
             aspectRatio = (float)(device.Viewport.Width /
             device.Viewport.Height);                     
@@ -38,47 +38,7 @@ namespace _3Dproject
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
-            yaw += (currPos.X - HalfHalf.X) * scale / 20;
-            pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
-
-            if (keyboardState.IsKeyDown(Keys.NumPad8))
-            {
-                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
-                add.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
-                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
-            }
-            if (keyboardState.IsKeyDown(Keys.NumPad5))
-            {
-                add.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
-                add.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
-                add.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
-            }
-            if (keyboardState.IsKeyDown(Keys.NumPad4))
-            {
-                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
-                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
-            }
-            if (keyboardState.IsKeyDown(Keys.NumPad6))
-            {
-                add.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
-                add.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
-            }
-
-            UpdateCameraHeight(keyboardState);
-
-            pitch = MathHelper.Clamp(pitch, -90, 90);
-            add.X = MathHelper.Clamp(add.X, 0, (Game1.terrain.Width - 2));
-            add.Z = MathHelper.Clamp(add.Z, 0, (Game1.terrain.Height - 2));                      
-            
-            viewMatrix = Matrix.CreateLookAt(add,add + cameraTarguet,Vector3.Up)
-                * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
-                * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
-
-            
-            //Debug.WriteLine("Position : ("+ (int)add.X+ ","+ (int)add.Y+ ","+(int)add.Z + ")-" + minHeight + "-" + add.Y + "\n TARGUET ("+ yaw+"|"+ pitch+"|"+cameraTarguet.Z +")");
-        }
-        private void UpdateCameraHeight(KeyboardState keyboardState)
-        {
+            //Update da câmara a ser usada
             for (int i = 0; i < cameraKeys.Length; i++)
             {
                 if (keyboardState.IsKeyDown(cameraKeys[i]))
@@ -86,31 +46,93 @@ namespace _3Dproject
                     CameraId = i;
                     break;
                 }
-            }            
+            }
 
-            float minHeight = Game1.terrain.retCameraHeight(add);
+            
+            yaw += (currPos.X - HalfHalf.X) * scale / 20;
+            pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
+            pitch = MathHelper.Clamp(pitch, -90, 90);
+
+            //Cálculo da altura mínima
+            float minHeight = Game1.terrain.retCameraHeight(pos);
 
             switch (CameraId)
             {
+                //SurfaceFollow
                 case 0:
-                    add.Y = minHeight + HeightOffset;
-                    break;
-                case 1:
-                    if (keyboardState.IsKeyDown(Keys.NumPad1))
-                        add.Y -= 1f;
-                    if (keyboardState.IsKeyDown(Keys.NumPad7))
-                        add.Y += 1f;
-                    add.Y = MathHelper.Clamp(add.Y, minHeight + HeightOffset, 100);
-                    break;                
-                default:                    
-                    break;
-            }                   
-        }
+                    if (keyboardState.IsKeyDown(Keys.NumPad8))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * CameraSpeed[1];
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * CameraSpeed[1];
+                    }
 
-        private int NextCamera( int _id)
-        {
-            if (_id == 2) return 1;
-            return _id + 1;
+                    if (keyboardState.IsKeyDown(Keys.NumPad5))
+                    {
+                        pos.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * CameraSpeed[1];
+                        pos.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * CameraSpeed[1];
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad4))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.5f;
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.5f;
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad6))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.75f;
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.75f;
+                    }
+
+                    pos.Y = minHeight + HeightOffset;
+                    break;
+
+                //FreeRoam
+                case 1:
+                    if (keyboardState.IsKeyDown(Keys.NumPad8))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                        pos.Y += (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad5))
+                    {
+                        pos.X -= (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                        pos.Y -= (float)Math.Sin(MathHelper.ToRadians(-pitch)) * CameraSpeed[0];
+                        pos.Z -= (float)Math.Sin(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad4))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.8f;
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad6))
+                    {
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.8f;
+                    }
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad1))
+                        pos.Y -= 1f;
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad7))
+                        pos.Y += 1f;
+
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 100);
+                    break;
+                default:
+                    break;
+            }
+
+            pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
+            pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
+
+            viewMatrix = Matrix.CreateLookAt(pos,pos + cameraTarguet,Vector3.Up)
+                * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
         }
     }
 }

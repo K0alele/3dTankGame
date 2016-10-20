@@ -46,19 +46,17 @@ namespace _3Dproject
             effect.Projection = Matrix.CreatePerspectiveFieldOfView(
             MathHelper.ToRadians(45.0f),
             device.Viewport.AspectRatio, 1.0f, 500f);
-            effect.LightingEnabled = false;
-            effect.VertexColorEnabled = true;
+            effect.VertexColorEnabled = false;
             effect.TextureEnabled = true;
             effect.Texture = texture;
             effect.LightingEnabled = true;
             effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
-            effect.DirectionalLight0.Direction = new Vector3(0.5f, -0.8f, 0);
-            //effect.DirectionalLight0.SpecularColor = new Vector3(0f, 0f, 0f);
+            effect.DirectionalLight0.Direction = new Vector3(.5f, -0.8f, 0);
             worldMatrix = Matrix.Identity;          
 
             YSCALE = _yScale;
 
-            CreateHightMap(content);
+            CreateHeightMap(content);
             CreateGeometry(device);      
         }
            
@@ -68,7 +66,7 @@ namespace _3Dproject
             return aux;
         } 
                 
-        private void CreateHightMap(ContentManager content)
+        private void CreateHeightMap(ContentManager content)
         {
             Texture2D YTexture = content.Load<Texture2D>("Hmap1");
 
@@ -168,16 +166,14 @@ namespace _3Dproject
        }
 
         public void Draw(GraphicsDevice device)
-        {
-            // World Matrix+            
+        { 
             effect.World =  worldMatrix;
             effect.View = Game1.MainCamera.viewMatrix;
             effect.Projection = Game1.MainCamera.projectionMatrix;
-            // Indica o efeito para desenhar os eixos
             effect.CurrentTechnique.Passes[0].Apply();
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;                        
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount/3);         
+            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount/3);     
         }
     }
 }
