@@ -25,7 +25,7 @@ namespace _3Dproject
         public Camera(GraphicsDevice device)
         {
             pos = new Vector3(10, 0, 10);
-            cameraTarguet = new Vector3(10, 0, 10);
+            cameraTarguet = new Vector3(10, 0, 0);
             viewMatrix = Matrix.CreateLookAt(pos,pos+cameraTarguet, Vector3.Up);
 
             aspectRatio = (float)(device.Viewport.Width /

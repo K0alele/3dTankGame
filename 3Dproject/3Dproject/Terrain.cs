@@ -116,13 +116,23 @@ namespace _3Dproject
                 }                
             }
 
-            short[] index = new short[((Width - 1) * (Height - 1)) * 6];
+            short[] index = new short[Width * 2*(Height - 1)];
 
             int count = 0;
             for (int y = 0; y < Height - 1; y++)
             {
-                for (int x = 0; x < Width - 1; x++)
+                for (int x = 0; x < Width; x++)
                 {
+                    //TriangleStrip
+                    int bottom = x + y * Width;
+                    int top = x + (y + 1) * Width;
+
+                    index[count] = (short)bottom;
+                    count++;
+                    index[count] = (short)top;
+                    count++;
+                    /*
+                    //TriangleList
                     int botomL = x + y * Width;
                     int topL = (x + 1) + y * Width;
                     int botomR = x + (y + 1) * Width;
@@ -140,10 +150,11 @@ namespace _3Dproject
                     count++;
                     index[count] = (short)topR;
                     count++;
+                    */
                 }
             }
 
-            for (int i = 0; i < index.Length/3; i++)
+            for (int i = 0; i < index.Length / 3; i++)
             {
                 int id1 = index[3 * i];
                 int id2 = index[3 * i + 1];
@@ -172,8 +183,11 @@ namespace _3Dproject
             effect.Projection = Game1.MainCamera.projectionMatrix;
             effect.CurrentTechnique.Passes[0].Apply();
             device.SetVertexBuffer(vertexBuffer);
-            device.Indices = indexBuffer;                        
-            device.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, indexBuffer.IndexCount/3);     
+            device.Indices = indexBuffer;
+            for (int y = 0; y < Height - 1; y++)
+            {
+                device.DrawIndexedPrimitives(PrimitiveType.LineStrip, 0, y * 2 * Width, (Width - 1) * 2);
+            }
         }
     }
 }
