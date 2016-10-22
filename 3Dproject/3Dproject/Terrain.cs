@@ -159,7 +159,7 @@ namespace _3Dproject
                 int id1 = index[2 * i];
                 int id2 = index[2 * i + 1];
                 int id3;
-                if ((2*i+2)%Width==0) id3 = index[2 * i - 1];
+                if ((2 * i + 2) >= index.Length) id3 = index[2*i-1];
                 else id3 = index[2 * i + 2];
 
                 Vector3 upLenght = vertices[id1].Position - vertices[id3].Position;
