@@ -124,8 +124,8 @@ namespace _3Dproject
                 for (int x = 0; x < Width; x++)
                 {
                     //TriangleStrip
-                    int bottom = x + y * Width;
-                    int top = x + (y + 1) * Width;
+                    int top = x + y * Width;
+                    int bottom = x + (y + 1) * Width;
 
                     index[count] = (short)bottom;
                     count++;
@@ -154,11 +154,13 @@ namespace _3Dproject
                 }
             }
 
-            for (int i = 0; i < index.Length / 3; i++)
+            for (int i = 0; i < index.Length / 2; i++)
             {
-                int id1 = index[3 * i];
-                int id2 = index[3 * i + 1];
-                int id3 = index[3 * i + 2];
+                int id1 = index[2 * i];
+                int id2 = index[2 * i + 1];
+                int id3;
+                if ((2*i+2)%Width==0) id3 = index[2 * i - 1];
+                else id3 = index[2 * i + 2];
 
                 Vector3 upLenght = vertices[id1].Position - vertices[id3].Position;
                 Vector3 downLength = vertices[id1].Position - vertices[id2].Position;
@@ -167,7 +169,6 @@ namespace _3Dproject
 
                 vertices[id1].Normal = normal;
                 vertices[id2].Normal = normal;
-                vertices[id3].Normal = normal;
             }
 
             vertexBuffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.None);
@@ -186,7 +187,7 @@ namespace _3Dproject
             device.Indices = indexBuffer;
             for (int y = 0; y < Height - 1; y++)
             {
-                device.DrawIndexedPrimitives(PrimitiveType.LineStrip, 0, y * 2 * Width, (Width - 1) * 2);
+                device.DrawIndexedPrimitives(PrimitiveType.TriangleStrip, 0, y * 2 * Width, (Width - 1) * 2);
             }
         }
     }
