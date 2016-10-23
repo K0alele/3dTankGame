@@ -16,10 +16,7 @@ namespace _3Dproject
         Matrix worldMatrix;
                
         VertexBuffer vertexBuffer;
-        IndexBuffer indexBuffer;
-        Vector4 add = Vector4.Zero;
-
-        Vector3 position = Vector3.Zero;                        
+        IndexBuffer indexBuffer;                
         
         public int Width = 0;
         public int Height = 0;
@@ -27,8 +24,6 @@ namespace _3Dproject
         float[,] HeightData;
 
         VertexPositionNormalTexture[] vertices;
-
-        Vector3 viewPos = new Vector3(4f, 10f, -5.0f);
 
         Texture2D texture;
 
@@ -38,14 +33,6 @@ namespace _3Dproject
 
             texture = content.Load<Texture2D>("TerrainTexture1");
 
-            float aspectRatio = (float)(device.Viewport.Width /
-            device.Viewport.Height);
-            effect.View = Matrix.CreateLookAt(
-            viewPos,
-            new Vector3(0, 5, 0), Vector3.Up);
-            effect.Projection = Matrix.CreatePerspectiveFieldOfView(
-            MathHelper.ToRadians(45.0f),
-            device.Viewport.AspectRatio, 1.0f, 500f);
             effect.VertexColorEnabled = false;
             effect.TextureEnabled = true;
             effect.Texture = texture;
@@ -59,13 +46,7 @@ namespace _3Dproject
             CreateHeightMap(content);
             CreateGeometry(device);      
         }
-           
-        public int[] RetWidthAndHeight()
-        {
-            int[] aux = {Width , Height};
-            return aux;
-        } 
-                
+                       
         private void CreateHeightMap(ContentManager content)
         {
             Texture2D YTexture = content.Load<Texture2D>("Hmap1");
@@ -109,15 +90,13 @@ namespace _3Dproject
             {
                 for (int z = 0; z < Height; z++)
                 {
-
                     vertices[x + z * Width] = new VertexPositionNormalTexture(new Vector3(x, (float)HeightData[x, z], z)
                         , Vector3.Zero,
-                        new Vector2((float)x / 30f, (float)z / 30f));
+                        new Vector2((float)x / 30, (float)z / 30));
                 }                
             }
 
             short[] index = new short[Width * 2*(Height - 1)];
-
             int count = 0;
             for (int y = 0; y < Height - 1; y++)
             {
@@ -131,26 +110,6 @@ namespace _3Dproject
                     count++;
                     index[count] = (short)top;
                     count++;
-                    /*
-                    //TriangleList
-                    int botomL = x + y * Width;
-                    int topL = (x + 1) + y * Width;
-                    int botomR = x + (y + 1) * Width;
-                    int topR = (x + 1) + (y + 1) * Width;
-
-                    index[count] = (short)botomL;
-                    count++;
-                    index[count] = (short)topL;
-                    count++;
-                    index[count] = (short)botomR;
-                    count++;
-                    index[count] = (short)botomR;
-                    count++;
-                    index[count] = (short)topL;
-                    count++;
-                    index[count] = (short)topR;
-                    count++;
-                    */
                 }
             }
 
@@ -159,7 +118,7 @@ namespace _3Dproject
                 int id1 = index[2 * i];
                 int id2 = index[2 * i + 1];
                 int id3;
-                if ((2 * i + 2) >= index.Length) id3 = index[2*i-1];
+                if ((2 * i + 2) >= index.Length) id3 = index[0];
                 else id3 = index[2 * i + 2];
 
                 Vector3 upLenght = vertices[id1].Position - vertices[id3].Position;

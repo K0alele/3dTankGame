@@ -74,8 +74,8 @@ namespace _3Dproject
 
                     if (keyboardState.IsKeyDown(Keys.NumPad4))
                     {
-                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.5f;
-                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.5f;
+                        pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.75f;
+                        pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw - 90)) * CameraSpeed[1] * 0.75f;
                     }
 
                     if (keyboardState.IsKeyDown(Keys.NumPad6))
