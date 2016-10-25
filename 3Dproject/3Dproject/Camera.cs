@@ -15,7 +15,7 @@ namespace _3Dproject
         private int CameraId = 0;
         private float[] CameraSpeed = { 0.5f, 0.4f};
         float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
-        float HeightOffset = 8f;
+        float HeightOffset = 8f, minHeight = 0;
         Vector3 cameraTarguet, pos;
 
         Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
@@ -51,10 +51,7 @@ namespace _3Dproject
             
             yaw += (currPos.X - HalfHalf.X) * scale / 20;
             pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
-            pitch = MathHelper.Clamp(pitch, -90, 90);
-
-            //Cálculo da altura mínima
-            float minHeight = Game1.terrain.retCameraHeight(pos);
+            pitch = MathHelper.Clamp(pitch, -90, 90);            
 
             switch (CameraId)
             {
@@ -83,6 +80,9 @@ namespace _3Dproject
                         pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.75f;
                         pos.Z += (float)Math.Sin(MathHelper.ToRadians(yaw + 90)) * CameraSpeed[1] * 0.75f;
                     }
+
+                    //Cálculo da altura mínima
+                    minHeight = Game1.terrain.retCameraHeight(pos);
 
                     pos.Y = minHeight + HeightOffset;
                     break;
@@ -120,6 +120,9 @@ namespace _3Dproject
 
                     if (keyboardState.IsKeyDown(Keys.NumPad7))
                         pos.Y += 1f;
+
+                   
+                    minHeight = Game1.terrain.retCameraHeight(pos);
 
                     pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 100);
                     break;
