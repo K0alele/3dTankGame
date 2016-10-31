@@ -20,7 +20,7 @@ namespace _3Dproject
 
         Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
 
-        public Matrix viewMatrix, projectionMatrix;        
+        public Matrix viewMatrix, projectionMatrix;       
 
         public Camera(GraphicsDevice device)
         {
@@ -136,6 +136,10 @@ namespace _3Dproject
             viewMatrix = Matrix.CreateLookAt(pos,pos + cameraTarguet,Vector3.Up)
                 * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
                 * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
+
+            Vector3 a = Game1.terrain.retTerrainNormal(pos);
+
+            //Debug.WriteLine("Original -X:" + Game1.terrain.NormalData[(int)pos.X,(int)pos.Z].X + "Y:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Y + "Z:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Z + "\nInterpol -X:" +a.X + "Y:"+ a.Y +"Z:"+a.Z);
         }
     }
 }

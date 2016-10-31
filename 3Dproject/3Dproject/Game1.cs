@@ -14,7 +14,10 @@ namespace _3Dproject
         public static Camera MainCamera;
         public static Terrain terrain;
 
-        Vector2 half;               
+        Vector2 half;
+
+        private bool canPress = true;
+        public bool Paused = false;
 
         public Game1()
         {
@@ -27,7 +30,7 @@ namespace _3Dproject
             MainCamera = new Camera(GraphicsDevice);            
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
-            terrain = new Terrain(GraphicsDevice, Content, 10f);
+            terrain = new Terrain(GraphicsDevice, Content, 12f);
 
             this.IsMouseVisible = false;
             base.Initialize();
@@ -48,14 +51,23 @@ namespace _3Dproject
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            MouseState mouseState = Mouse.GetState();
-            Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
-                       
-            MainCamera.Update(mousePos, half);
-            
-            Mouse.SetPosition((int)half.X, (int)half.Y);
-            base.Update(gameTime);
-            
+            if (Keyboard.GetState().IsKeyDown(Keys.P) && canPress)
+            {
+                Paused = !Paused;
+                canPress = false;
+            }
+            else if (!Keyboard.GetState().IsKeyDown(Keys.P))            
+                canPress = true;
+            if (!Paused)
+            {
+                MouseState mouseState = Mouse.GetState();
+                Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
+
+                MainCamera.Update(mousePos, half);
+
+                Mouse.SetPosition((int)half.X, (int)half.Y);
+                base.Update(gameTime);
+            }                             
         }
 
         protected override void Draw(GameTime gameTime)

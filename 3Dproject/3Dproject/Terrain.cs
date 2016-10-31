@@ -23,11 +23,9 @@ namespace _3Dproject
         public int Height = 0;
         private float YSCALE = 0f;
         float[,] HeightData;
-
-        VertexPositionNormalTexture[] vertices;
-
+        
         Texture2D texture;
-        private Vector3[,] NormalData;
+        Vector3[,] NormalData;
 
         public Terrain(GraphicsDevice device, ContentManager content , float _yScale)
         {            
@@ -45,10 +43,10 @@ namespace _3Dproject
             worldMatrix = Matrix.Identity;
 
             //FOG YAY
-            effect.FogEnabled = true;
-            effect.FogColor = Color.LightGray.ToVector3();            
-            effect.FogStart = 5f;
-            effect.FogEnd = 100f;
+            //effect.FogEnabled = true;
+            //effect.FogColor = Color.LightGray.ToVector3();            
+            //effect.FogStart = 5f;
+            //effect.FogEnd = 100f;
 
             YSCALE = _yScale;
 
@@ -104,9 +102,8 @@ namespace _3Dproject
         }
 
         private void CreateGeometry(GraphicsDevice device)
-        {
-
-            vertices = new VertexPositionNormalTexture[Width * Height];
+        {      
+            VertexPositionNormalTexture[] vertices = new VertexPositionNormalTexture[Width * Height];
 
             for (int x = 0; x < Width; x++)
             {
@@ -136,7 +133,7 @@ namespace _3Dproject
             }
 
             NormalData = new Vector3[Width, Height];
-            createNormals();
+            createNormals(vertices);
 
             vertexBuffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.None);
             vertexBuffer.SetData<VertexPositionNormalTexture>(vertices);
@@ -144,12 +141,12 @@ namespace _3Dproject
             indexBuffer.SetData<short>(index);            
         }
 
-        public void createNormals()
+        public void createNormals(VertexPositionNormalTexture[] vertices)
         {
             // Primeira Linha
             for (int x = 1; x < Width - 1; x++)
             {
-                for (int y = 0; y < Height - 1; y += Height)
+                for (int y = 0; y < Height; y += Height)
                 {
                     int id5 = x + 0 + (y + 0) * Width;
 
