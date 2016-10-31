@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading. Tasks;
 
 namespace _3Dproject
 {
@@ -124,7 +124,7 @@ namespace _3Dproject
                    
                     minHeight = Game1.terrain.retCameraHeight(pos);
 
-                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 100);
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 200);
                     break;
                 default:
                     break;

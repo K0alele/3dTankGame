@@ -32,10 +32,7 @@ D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\OpenTK.dll
 D:\GitHub\3dTankGame\3Dproject\3Dproject\obj\x86\Debug\3Dproject.csprojResolveAssemblyReference.cache
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap1.jpg
 D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Hmap1.jpg
-C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\50 cal.xnb
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Down1_0.xnb
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Down2_0.xnb
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\LEOPMA2T_0.xnb
-C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\T 90D.xnb
-C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\T_90_S.xnb
 C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Up3_0.xnb
