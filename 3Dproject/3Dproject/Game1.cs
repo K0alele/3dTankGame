@@ -13,8 +13,9 @@ namespace _3Dproject
         
         public static Camera MainCamera;
         public static Terrain terrain;
+        public static Tank MainTank;
 
-        Vector2 half;
+        Vector2 half;        
 
         private bool canPress = true;
         public bool Paused = false;
@@ -27,10 +28,12 @@ namespace _3Dproject
 
         protected override void Initialize()
         {
-            MainCamera = new Camera(GraphicsDevice);            
+            MainCamera = new Camera(GraphicsDevice);    
+                    
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
-            terrain = new Terrain(GraphicsDevice, Content, 12f);
+            terrain = new Terrain(GraphicsDevice, Content, 16f);
+            MainTank = new Tank(GraphicsDevice, Content);
 
             this.IsMouseVisible = false;
             base.Initialize();
@@ -64,6 +67,7 @@ namespace _3Dproject
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
 
                 MainCamera.Update(mousePos, half);
+                MainTank.Update();
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);
@@ -75,6 +79,7 @@ namespace _3Dproject
             GraphicsDevice.Clear(Color.LightGray);
 
             terrain.Draw(GraphicsDevice);
+            MainTank.Draw(GraphicsDevice);
 
             base.Draw(gameTime);
         }

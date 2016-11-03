@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading. Tasks;
+using System.Threading.Tasks;
 
 namespace _3Dproject
 {
@@ -14,11 +14,11 @@ namespace _3Dproject
     {
         private int CameraId = 0;
         private float[] CameraSpeed = { 0.5f, 0.4f};
-        float yaw = 0f, pitch = 0f,aspectRatio, scale = 1f;
+        float yaw = 90f, pitch = 0f,aspectRatio, scale = 1f, cameraDistance = 15;
         float HeightOffset = 8f, minHeight = 0;
         Vector3 cameraTarguet, pos;
 
-        Keys[] cameraKeys = { Keys.F1, Keys.F2 };        
+        Keys[] cameraKeys = { Keys.F1, Keys.F2 , Keys.F3};        
 
         public Matrix viewMatrix, projectionMatrix;       
 
@@ -47,7 +47,6 @@ namespace _3Dproject
                     break;
                 }
             }
-
             
             yaw += (currPos.X - HalfHalf.X) * scale / 20;
             pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
@@ -85,6 +84,13 @@ namespace _3Dproject
                     minHeight = Game1.terrain.retCameraHeight(pos);
 
                     pos.Y = minHeight + HeightOffset;
+
+                    pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
+                    pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
+
+                    viewMatrix = Matrix.CreateLookAt(pos, pos + cameraTarguet, Vector3.Up)
+                        * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                        * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
                     break;
 
                 //FreeRoam
@@ -124,21 +130,38 @@ namespace _3Dproject
                    
                     minHeight = Game1.terrain.retCameraHeight(pos);
 
-                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 200);
+                    pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
+                    pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 150);
+
+                    viewMatrix = Matrix.CreateLookAt(pos, pos + cameraTarguet, Vector3.Up)
+                        * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                        * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
+                    
+                    break;
+                case 2:
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad1))
+                        cameraDistance -= 1f;
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad7))
+                        cameraDistance += 1f;
+
+                    pos = Vector3.Transform(new Vector3((Game1.MainTank.position.X - cameraDistance),
+                        Game1.MainTank.position.Y + cameraDistance,
+                        Game1.MainTank.position.Z) - Game1.MainTank.position
+                    , Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), MathHelper.ToRadians(pitch), 0)) + Game1.MainTank.position;
+                   
+                    pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
+                    pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
+                    minHeight = Game1.terrain.retCameraHeight(pos);
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + 2, 150);
+
+                    viewMatrix = Matrix.CreateLookAt(pos, Game1.MainTank.position, Vector3.Up);
                     break;
                 default:
                     break;
-            }
-
-            pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
-            pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
-
-            viewMatrix = Matrix.CreateLookAt(pos,pos + cameraTarguet,Vector3.Up)
-                * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
-                * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
-
-            Vector3 a = Game1.terrain.retTerrainNormal(pos);
-
+            }                     
             //Debug.WriteLine("Original -X:" + Game1.terrain.NormalData[(int)pos.X,(int)pos.Z].X + "Y:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Y + "Z:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Z + "\nInterpol -X:" +a.X + "Y:"+ a.Y +"Z:"+a.Z);
         }
     }
