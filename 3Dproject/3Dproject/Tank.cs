@@ -13,6 +13,10 @@ namespace _3Dproject
 {
     public class Tank
     {
+        //TESTE
+        BasicEffect basicEffect;
+        //TESTE
+
         BasicEffect effect;
 
         Model tankModel;
@@ -37,6 +41,7 @@ namespace _3Dproject
         {
             scale = 0.01f;
 
+            basicEffect = new BasicEffect(device);
             effect = new BasicEffect(device);
 
             tankModel = content.Load<Model>("Tank/tank");
@@ -103,7 +108,7 @@ namespace _3Dproject
         public void Draw(GraphicsDevice device)
         {
             Vector3 direction = Vector3.Transform(position, Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)));
-            direction.Normalize();
+            //direction.Normalize();
 
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
@@ -112,8 +117,8 @@ namespace _3Dproject
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)) * inclinationMatrix;
-            
-            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw- TankYaw)) * turretTransform;
+
+            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw - TankYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
@@ -127,15 +132,34 @@ namespace _3Dproject
                 {
                     effect.Projection = Game1.MainCamera.projectionMatrix;
                     effect.View = Game1.MainCamera.viewMatrix;
-                    effect.World =  boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
+                    effect.World = boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
 
                     effect.LightingEnabled = true;
 
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
-                    effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);                    
-                }                                
+                    effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
+                }
                 mesh.Draw();
+                //TEST  
+                DrawVectors(device, position, position + tankNormal, Color.Red);
+                DrawVectors(device, position, position + tankRight, Color.Green);
+                DrawVectors(device, position, position + tankFront, Color.Black);
+                DrawVectors(device, position, position + direction, Color.HotPink);
+                //TEST
             }
+        }
+
+        private void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
+        {
+            basicEffect.Projection = Game1.MainCamera.projectionMatrix;
+            basicEffect.View = Game1.MainCamera.viewMatrix;
+            basicEffect.World = worldMatrix;
+            basicEffect.VertexColorEnabled = true;
+            basicEffect.CurrentTechnique.Passes[0].Apply();
+            startPoint.Y += 4;
+            endPoint.Y += 4;
+            var vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
+            device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }
     }
 }
