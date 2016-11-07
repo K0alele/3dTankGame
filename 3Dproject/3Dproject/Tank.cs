@@ -80,13 +80,13 @@ namespace _3Dproject
 
             if (keyboardState.IsKeyDown(Keys.W))
             {
-                position.X += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
-                position.Z += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
+                position.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
+                position.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
             }
             if (keyboardState.IsKeyDown(Keys.S))
             {
-                position.X -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
-                position.Z -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
+                position.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
+                position.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
             }
 
             canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
@@ -102,18 +102,18 @@ namespace _3Dproject
 
         public void Draw(GraphicsDevice device)
         {
-            Vector3 direction = Vector3.Transform(position, Matrix.CreateRotationY(MathHelper.ToRadians(90 - TankYaw)));
+            Vector3 direction = Vector3.Transform(position, Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)));
             direction.Normalize();
 
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
-            Vector3 tankRight = Vector3.Cross(tankNormal, direction);
+            Vector3 tankRight = Vector3.Cross(direction, tankNormal);
             Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
 
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
-            tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(90 - TankYaw)) * inclinationMatrix;
-
-            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw -  turretYaw)) * turretTransform;
+            tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)) * inclinationMatrix;
+            
+            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw- TankYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
