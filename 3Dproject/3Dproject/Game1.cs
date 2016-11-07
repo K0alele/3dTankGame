@@ -66,7 +66,7 @@ namespace _3Dproject
                 MouseState mouseState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);
 
-                MainCamera.Update(mousePos, half);
+                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
                 MainTank.Update();
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);

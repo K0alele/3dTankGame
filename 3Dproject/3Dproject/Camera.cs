@@ -12,7 +12,7 @@ namespace _3Dproject
 {
     public class Camera
     {
-        private int CameraId = 0;
+        private int CameraId = 2, PrevScrollWeelValue = 0;
         private float[] CameraSpeed = { 0.5f, 0.4f};
         float yaw = 90f, pitch = 0f,aspectRatio, scale = 1f, cameraDistance = 15;
         float HeightOffset = 8f, minHeight = 0;
@@ -34,7 +34,7 @@ namespace _3Dproject
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.3f, 1000.0f);
         }
 
-        public void Update(Vector2 currPos, Vector2 HalfHalf)
+        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -141,17 +141,19 @@ namespace _3Dproject
                     break;
                 case 2:
 
-                    if (keyboardState.IsKeyDown(Keys.NumPad1))
+                    pitch = MathHelper.Clamp(pitch, -40, 45);
+                    if (scrollValue > PrevScrollWeelValue && cameraDistance > 8)
                         cameraDistance -= 1f;
-
-                    if (keyboardState.IsKeyDown(Keys.NumPad7))
+                    if (scrollValue < PrevScrollWeelValue && cameraDistance < 30)
                         cameraDistance += 1f;
+
+                    PrevScrollWeelValue = scrollValue;
 
                     pos = Vector3.Transform(new Vector3((Game1.MainTank.position.X - cameraDistance),
                         Game1.MainTank.position.Y + cameraDistance,
                         Game1.MainTank.position.Z) - Game1.MainTank.position
-                    , Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), MathHelper.ToRadians(pitch), 0)) + Game1.MainTank.position;
-                   
+                    , Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), 0, MathHelper.ToRadians(pitch))) + Game1.MainTank.position;
+
                     pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
                     pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
                     minHeight = Game1.terrain.retCameraHeight(pos);
@@ -161,8 +163,8 @@ namespace _3Dproject
                     break;
                 default:
                     break;
-            }                     
-            //Debug.WriteLine("Original -X:" + Game1.terrain.NormalData[(int)pos.X,(int)pos.Z].X + "Y:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Y + "Z:" + Game1.terrain.NormalData[(int)pos.X, (int)pos.Z].Z + "\nInterpol -X:" +a.X + "Y:"+ a.Y +"Z:"+a.Z);
+            }
+            //Debug.WriteLine("");                          
         }
     }
 }

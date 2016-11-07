@@ -101,16 +101,25 @@ namespace _3Dproject
         }
 
         public void Draw(GraphicsDevice device)
-        {            
-            tankModel.Root.Transform = Matrix.CreateTranslation(new Vector3(0f, 0f, 1f))
-                * /*Matrix.CreateRotationY(MathHelper.ToRadians(90 - TankYaw))*/
-                Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(90 - TankYaw), 0,0)
-                * Matrix.CreateScale(scale);
+        {
+            Vector3 direction = Vector3.Transform(position, Matrix.CreateRotationY(MathHelper.ToRadians(90 - TankYaw)));
+            direction.Normalize();
 
-            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw + turretYaw)) * turretTransform;
+            Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
+            Vector3 tankRight = Vector3.Cross(tankNormal, direction);
+            Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
+
+            Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
+
+            tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(90 - TankYaw)) * inclinationMatrix;
+
+            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw -  turretYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
+
+            Debug.WriteLine("Yaw : " + TankYaw + "\ntankNormal : (" + tankNormal.X + "| " + tankNormal.Y + "| " + tankNormal.Z + ")" + "\ntankright : (" + tankRight.X + "| " + tankRight.Y + "| " + tankRight.Z + ")" +
+                "\ntanFrontt: (" + tankFront.X + " | " + tankFront.Y + " | " + tankFront.Z + ")");
 
             foreach (ModelMesh mesh in tankModel.Meshes)
             {
@@ -118,7 +127,7 @@ namespace _3Dproject
                 {
                     effect.Projection = Game1.MainCamera.projectionMatrix;
                     effect.View = Game1.MainCamera.viewMatrix;
-                    effect.World = boneTransforms[mesh.ParentBone.Index] * Matrix.CreateTranslation(position);
+                    effect.World =  boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
 
                     effect.LightingEnabled = true;
 
