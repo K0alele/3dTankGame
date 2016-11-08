@@ -107,7 +107,7 @@ namespace _3Dproject
 
         public void Draw(GraphicsDevice device)
         {
-            Vector3 direction = Vector3.Transform(position, Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)));
+            Vector3 direction = Vector3.Transform(new Vector3(1,0,0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
             //direction.Normalize();
 
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
@@ -116,14 +116,12 @@ namespace _3Dproject
 
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
-            tankModel.Root.Transform =  inclinationMatrix * Matrix.CreateScale(scale);
+            tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
 
             turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw - TankYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
-
-            Debug.WriteLine("YAW : "+ TankYaw);
 
             foreach (ModelMesh mesh in tankModel.Meshes)
             {
@@ -131,7 +129,7 @@ namespace _3Dproject
                 {
                     effect.Projection = Game1.MainCamera.projectionMatrix;
                     effect.View = Game1.MainCamera.viewMatrix;
-                    effect.World = boneTransforms[mesh.ParentBone.Index] /** Matrix.CreateScale(scale) */* Matrix.CreateTranslation(position);
+                    effect.World = boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
 
                     effect.LightingEnabled = true;
 
@@ -143,7 +141,7 @@ namespace _3Dproject
                 DrawVectors(device, position, position + tankNormal, Color.Red);
                 DrawVectors(device, position, position + tankRight, Color.Green);
                 DrawVectors(device, position, position + tankFront, Color.Black);
-                DrawVectors(device, position, position + direction, Color.HotPink);
+                DrawVectors(device, position, position + direction, Color.HotPink);                
                 //TEST
             }
         }

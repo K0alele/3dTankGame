@@ -144,7 +144,7 @@ namespace _3Dproject
                     pitch = MathHelper.Clamp(pitch, -40, 45);
                     if (scrollValue > PrevScrollWeelValue && cameraDistance > 8)
                         cameraDistance -= 1f;
-                    if (scrollValue < PrevScrollWeelValue && cameraDistance < 30)
+                    if (scrollValue < PrevScrollWeelValue && cameraDistance < 60)
                         cameraDistance += 1f;
 
                     PrevScrollWeelValue = scrollValue;
