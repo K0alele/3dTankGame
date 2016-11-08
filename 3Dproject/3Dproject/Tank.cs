@@ -116,15 +116,14 @@ namespace _3Dproject
 
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
-            tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(TankYaw)) * inclinationMatrix;
+            tankModel.Root.Transform =  inclinationMatrix * Matrix.CreateScale(scale);
 
             turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw - TankYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
-            Debug.WriteLine("Yaw : " + TankYaw + "\ntankNormal : (" + tankNormal.X + "| " + tankNormal.Y + "| " + tankNormal.Z + ")" + "\ntankright : (" + tankRight.X + "| " + tankRight.Y + "| " + tankRight.Z + ")" +
-                "\ntanFrontt: (" + tankFront.X + " | " + tankFront.Y + " | " + tankFront.Z + ")");
+            Debug.WriteLine("YAW : "+ TankYaw);
 
             foreach (ModelMesh mesh in tankModel.Meshes)
             {
@@ -132,7 +131,7 @@ namespace _3Dproject
                 {
                     effect.Projection = Game1.MainCamera.projectionMatrix;
                     effect.View = Game1.MainCamera.viewMatrix;
-                    effect.World = boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
+                    effect.World = boneTransforms[mesh.ParentBone.Index] /** Matrix.CreateScale(scale) */* Matrix.CreateTranslation(position);
 
                     effect.LightingEnabled = true;
 
@@ -149,7 +148,7 @@ namespace _3Dproject
             }
         }
 
-        private void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
+        public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
         {
             basicEffect.Projection = Game1.MainCamera.projectionMatrix;
             basicEffect.View = Game1.MainCamera.viewMatrix;
