@@ -17,9 +17,10 @@ namespace _3Dproject
         BasicEffect basicEffect;
         //TESTE
 
-        BasicEffect effect;
+        BasicEffect effect;        
 
         Model tankModel;
+        Model Bullet;
         Matrix worldMatrix;
 
         ModelBone turretBone;
@@ -35,7 +36,7 @@ namespace _3Dproject
         Matrix hatchtransform;
 
         Matrix[] boneTransforms;
-
+        
         float scale, steerMult = 1;
         private float turretYaw = 0f;
         private float canonPitch = 0f;
@@ -43,14 +44,18 @@ namespace _3Dproject
         string[] wheelNames = { "l_front_wheel_geo", "r_front_wheel_geo", "l_back_wheel_geo", "r_back_wheel_geo" };
         string[] steerNames = { "r_steer_geo", "l_steer_geo" };
 
-        private float TankYaw = 0f, TankPitch = 0f, wheelsRotation = 0f, steerYaw = 0, hatchRotation = 0;
+        private float TankYaw = 0f, wheelsRotation = 0f, steerYaw = 0, hatchRotation = 0;
 
-        public Vector3 position = new Vector3(10, 0, 10);
+        private Vector3 position;
 
-        public Tank(GraphicsDevice device, ContentManager content)
+        HashSet<Bullet> bulletList;
+
+        KeyboardState prevKeyboard;
+
+        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position)
         {
             scale = 0.01f;
-
+            position = _position;
             //TEST
             basicEffect = new BasicEffect(device);
             //TEST
@@ -58,6 +63,7 @@ namespace _3Dproject
             effect = new BasicEffect(device);
 
             tankModel = content.Load<Model>("Tank/tank");
+            Bullet = content.Load<Model>("Bullet/Sphere");
 
             effect.LightingEnabled = true;
 
@@ -84,6 +90,13 @@ namespace _3Dproject
 
             boneTransforms = new Matrix[tankModel.Bones.Count];
             worldMatrix = Matrix.Identity;
+            prevKeyboard = Keyboard.GetState();
+            bulletList = new HashSet<Bullet>();
+        }
+
+        public Vector3 returnPosition()
+        {
+            return position;
         }
 
         public void Update()
@@ -95,9 +108,9 @@ namespace _3Dproject
             if (keyboardState.IsKeyDown(Keys.Down))
                 canonPitch -= 2f;
             if (keyboardState.IsKeyDown(Keys.Right))
-                turretYaw -= 2f;
+                turretYaw -= 2.5f;
             if (keyboardState.IsKeyDown(Keys.Left))
-                turretYaw += 2f;
+                turretYaw += 2.5f;
 
             if (keyboardState.IsKeyDown(Keys.A))
             {
@@ -113,7 +126,7 @@ namespace _3Dproject
             {
                 if (steerYaw > 0)
                     steerYaw -= 4f;
-                else
+                else if(steerYaw < 0)
                     steerYaw += 4f;
             }
 
@@ -139,6 +152,12 @@ namespace _3Dproject
             else if (keyboardState.IsKeyDown(Keys.I))
                 hatchRotation -= 2f;
 
+            if (keyboardState.IsKeyDown(Keys.Enter) && !prevKeyboard.IsKeyDown(Keys.Enter))
+            {
+                bulletList.Add(new Bullet(effect, Bullet, position, TankYaw + TankYaw, canonPitch, 2f));
+            }
+
+
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
             canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
@@ -149,13 +168,14 @@ namespace _3Dproject
             float minHeight = Game1.terrain.retCameraHeight(position);
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
 
+            prevKeyboard = keyboardState;
+
             position.Y = minHeight;
         }
 
         public void Draw(GraphicsDevice device)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
-            //direction.Normalize();
 
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
@@ -165,18 +185,14 @@ namespace _3Dproject
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
 
-            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw - TankYaw)) * turretTransform;
+            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw )) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
-            for (int i = 0; i < wheelsBones.Length; i++)
-            {
-                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation)) * wheelsTransform[i];
-            }
-            for (int i = 0; i < steerBones.Length; i++)
-            {
-                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
-            }
+            for (int i = 0; i < wheelsBones.Length; i++)            
+                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation)) * wheelsTransform[i];            
+            for (int i = 0; i < steerBones.Length; i++)            
+                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];            
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
@@ -193,14 +209,20 @@ namespace _3Dproject
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }
-                mesh.Draw();
-                //TEST  
-                DrawVectors(device, position, position + tankNormal, Color.Red);
-                DrawVectors(device, position, position + tankRight, Color.Green);
-                DrawVectors(device, position, position + tankFront, Color.Black);
-                DrawVectors(device, position, position + direction, Color.HotPink);
-                //TEST
+                mesh.Draw();            
             }
+
+            foreach (var item in bulletList)
+            {
+                item.Draw();
+            }
+
+            //TEST  
+            DrawVectors(device, position, position + tankNormal, Color.Red);
+            DrawVectors(device, position, position + tankRight, Color.Green);
+            DrawVectors(device, position, position + tankFront, Color.White);
+            DrawVectors(device, position, position + direction, Color.HotPink);
+            //TEST
         }
 
         public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)

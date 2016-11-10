@@ -331,8 +331,8 @@ namespace _3Dproject
             Vector3 NLength2 = vertices[Nid5].Position - vertices[Nid8].Position;
             Vector3 NLength3 = vertices[Nid5].Position - vertices[Nid9].Position;
 
-            Vector3 Nnormal1 = Vector3.Cross(NLength2, NLength1);
-            Vector3 Nnormal2 = Vector3.Cross(NLength3, NLength2);
+            Vector3 Nnormal1 = Vector3.Cross(NLength3, NLength1);
+            Vector3 Nnormal2 = Vector3.Cross(NLength2, NLength3);
 
             Vector3 Nmedia = (Nnormal1 + Nnormal2) / 2;
             Nmedia.Normalize();
@@ -405,7 +405,7 @@ namespace _3Dproject
 
         public void Draw(GraphicsDevice device)
         { 
-            effect.World =  worldMatrix;
+            effect.World = worldMatrix;
             effect.View = Game1.MainCamera.viewMatrix;
             effect.Projection = Game1.MainCamera.projectionMatrix;
             effect.CurrentTechnique.Passes[0].Apply();

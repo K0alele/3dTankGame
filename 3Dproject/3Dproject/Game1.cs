@@ -33,7 +33,7 @@ namespace _3Dproject
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
-            MainTank = new Tank(GraphicsDevice, Content);
+            MainTank = new Tank(GraphicsDevice, Content, new Vector3(10,0,10));
 
             this.IsMouseVisible = false;
             base.Initialize();

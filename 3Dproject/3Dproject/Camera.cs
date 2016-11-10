@@ -140,8 +140,7 @@ namespace _3Dproject
                     
                     break;
                 case 2:
-
-                    pitch = MathHelper.Clamp(pitch, -40, 45);
+                    pitch = MathHelper.Clamp(pitch, -40, 40);
                     if (scrollValue > PrevScrollWeelValue && cameraDistance > 8)
                         cameraDistance -= 1f;
                     if (scrollValue < PrevScrollWeelValue && cameraDistance < 60)
@@ -149,22 +148,23 @@ namespace _3Dproject
 
                     PrevScrollWeelValue = scrollValue;
 
-                    pos = Vector3.Transform(new Vector3((Game1.MainTank.position.X - cameraDistance),
-                        Game1.MainTank.position.Y + cameraDistance,
-                        Game1.MainTank.position.Z) - Game1.MainTank.position
-                    , Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), 0, MathHelper.ToRadians(pitch))) + Game1.MainTank.position;
+                    Vector3 tankPos = Game1.MainTank.returnPosition();
+
+                    pos = Vector3.Transform(new Vector3((tankPos.X - cameraDistance),
+                        tankPos.Y + cameraDistance,
+                        tankPos.Z) -tankPos
+                    , Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(yaw), 0, MathHelper.ToRadians(pitch))) + tankPos;
 
                     pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
                     pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
                     minHeight = Game1.terrain.retCameraHeight(pos);
-                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + 2, 150);
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + 1, 150);
 
-                    viewMatrix = Matrix.CreateLookAt(pos, Game1.MainTank.position, Vector3.Up);
+                    viewMatrix = Matrix.CreateLookAt(pos, tankPos, Vector3.Up);
                     break;
                 default:
                     break;
-            }
-            //Debug.WriteLine("");                          
+            }                        
         }
     }
 }

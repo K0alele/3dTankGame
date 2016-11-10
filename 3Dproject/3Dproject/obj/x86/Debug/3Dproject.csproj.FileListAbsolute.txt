@@ -50,3 +50,4 @@ D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Tank\en
 D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Tank\tank.xnb
 D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Tank\turret_alt_diff_tex.xnb
 D:\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Tank\turret_alt_diff_tex_0.xnb
+C:\Users\Diogo\Documents\GitHub\3dTankGame\3Dproject\3Dproject\bin\DesktopGL\x86\Debug\Content\Bullet\Sphere.xnb
