@@ -104,6 +104,7 @@ namespace _3Dproject
         private void CreateGeometry(GraphicsDevice device)
         {      
             VertexPositionNormalTexture[] vertices = new VertexPositionNormalTexture[Width * Height];
+            NormalData = new Vector3[Width, Height];
 
             for (int x = 0; x < Width; x++)
             {
@@ -131,8 +132,7 @@ namespace _3Dproject
                     count++;
                 }
             }
-
-            NormalData = new Vector3[Width, Height];
+            
             createNormals(vertices);
 
             vertexBuffer = new VertexBuffer(device, typeof(VertexPositionNormalTexture), vertices.Length, BufferUsage.None);

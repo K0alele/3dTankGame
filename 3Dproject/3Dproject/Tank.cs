@@ -44,13 +44,18 @@ namespace _3Dproject
         string[] wheelNames = { "l_front_wheel_geo", "r_front_wheel_geo", "l_back_wheel_geo", "r_back_wheel_geo" };
         string[] steerNames = { "r_steer_geo", "l_steer_geo" };
 
-        private float TankYaw = 0f, wheelsRotation = 0f, steerYaw = 0, hatchRotation = 0;
+        private float TankYaw = 0f, steerYaw = 0, hatchRotation = 0;
+        private float[] wheelsRotation;
+        private float limitZ, limitX;       
 
         private Vector3 position;
+        private Vector3 bulletDirecction;
 
-        HashSet<Bullet> bulletList;
+        List<Bullet> bulletList;
 
         KeyboardState prevKeyboard;
+        private Vector3 tankFront;
+        private Vector3 tankNormal = Vector3.Zero;
 
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position)
         {
@@ -88,15 +93,28 @@ namespace _3Dproject
             for (int i = 0; i < steerBones.Length; i++)
                 steerTransform[i] = steerBones[i].Transform;
 
+            limitX = (Game1.terrain.Width - 2);
+            limitZ = (Game1.terrain.Height - 2);
+
             boneTransforms = new Matrix[tankModel.Bones.Count];
+            wheelsRotation = new float[4];
             worldMatrix = Matrix.Identity;
             prevKeyboard = Keyboard.GetState();
-            bulletList = new HashSet<Bullet>();
+            bulletList = new List<Bullet>();
         }
 
         public Vector3 returnPosition()
         {
             return position;
+        }
+
+        public float[] addArrays(float[] a1, float[] a2)
+        {
+            float[] result = new float[a1.Length];
+
+            for (int i = 0; i < a1.Length; i++)            
+                result[i] = a1[i] + a2[i];            
+            return result;
         }
 
         public void Update()
@@ -116,34 +134,60 @@ namespace _3Dproject
             {
                 TankYaw += 2f;
                 steerYaw += 2f * steerMult;
+                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
+                {
+                    wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, 5f });
+                    steerMult = -1f;
+                    steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
+                }
+                else
+                {
+                    if (steerYaw > 30)                    
+                        steerYaw -= 5f;                    
+                    if (steerYaw < -30)                    
+                        steerYaw += 5f;                    
+                }                
             }
             if (keyboardState.IsKeyDown(Keys.D))
             {
                 TankYaw -= 2f;
                 steerYaw -= 2f * steerMult;
+                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
+                {
+                    wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, 5f, -5f });
+                    steerMult = -1f;
+                    steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
+                }
+                else
+                {
+                    if (steerYaw > 30)                    
+                        steerYaw -= 5f;                    
+                    if (steerYaw < -30)                    
+                        steerYaw += 5f;                    
+                }
+
             }
+
             if (!keyboardState.IsKeyDown(Keys.D) && !keyboardState.IsKeyDown(Keys.A))
             {
                 if (steerYaw > 0)
                     steerYaw -= 4f;
-                else if(steerYaw < 0)
+                else if (steerYaw < 0)
                     steerYaw += 4f;
-            }
-
-            steerYaw = MathHelper.Clamp(steerYaw, -25, 25);
+            }           
 
             if (keyboardState.IsKeyDown(Keys.W))
             {
                 position.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 position.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
-                wheelsRotation += 10f;
+                wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
             }
             if (keyboardState.IsKeyDown(Keys.S))
             {
                 position.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 position.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
-                wheelsRotation -= 5f;
+                wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
             }
 
@@ -152,21 +196,30 @@ namespace _3Dproject
             else if (keyboardState.IsKeyDown(Keys.I))
                 hatchRotation -= 2f;
 
-            if (keyboardState.IsKeyDown(Keys.Enter) && !prevKeyboard.IsKeyDown(Keys.Enter))
+            if (keyboardState.IsKeyDown(Keys.Space) && !prevKeyboard.IsKeyDown(Keys.Space))
             {
-                bulletList.Add(new Bullet(effect, Bullet, position, TankYaw + TankYaw, canonPitch, 2f));
+                bulletDirecction = Vector3.Transform(new Vector3(2, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + turretYaw + TankYaw)));
+                bulletList.Add(new Bullet(effect, Bullet, position + tankNormal + bulletDirecction, TankYaw + turretYaw, canonPitch, 0.5f));
             }
 
+            float minHeight = Game1.terrain.retCameraHeight(position);
 
+            for (int i = 0; i < bulletList.Count; i++)
+            {                
+                Vector3 pos = bulletList[i].returnPosition();
+                if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ)
+                    bulletList.Remove(bulletList[i]);
+                else bulletList[i].Update();
+            }  
+                
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
             canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
 
-            position.X = MathHelper.Clamp(position.X, 0, (Game1.terrain.Width - 2));
-            position.Z = MathHelper.Clamp(position.Z, 0, (Game1.terrain.Height - 2));
-
-            float minHeight = Game1.terrain.retCameraHeight(position);
-            Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
+            position.X = MathHelper.Clamp(position.X, 0, limitX);
+            position.Z = MathHelper.Clamp(position.Z, 0, limitZ);
+           
+            tankNormal = Game1.terrain.retTerrainNormal(position);
 
             prevKeyboard = keyboardState;
 
@@ -177,9 +230,9 @@ namespace _3Dproject
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
-            Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
+            tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
-            Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
+            tankFront = Vector3.Cross(tankNormal, tankRight);
 
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
@@ -190,7 +243,7 @@ namespace _3Dproject
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
             for (int i = 0; i < wheelsBones.Length; i++)            
-                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation)) * wheelsTransform[i];            
+                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];            
             for (int i = 0; i < steerBones.Length; i++)            
                 steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];            
 
@@ -212,16 +265,15 @@ namespace _3Dproject
                 mesh.Draw();            
             }
 
-            foreach (var item in bulletList)
-            {
-                item.Draw();
-            }
+            foreach (var item in bulletList)            
+                item.Draw();            
 
             //TEST  
             DrawVectors(device, position, position + tankNormal, Color.Red);
             DrawVectors(device, position, position + tankRight, Color.Green);
             DrawVectors(device, position, position + tankFront, Color.White);
             DrawVectors(device, position, position + direction, Color.HotPink);
+            DrawVectors(device, position, position + bulletDirecction, Color.Black);
             //TEST
         }
 

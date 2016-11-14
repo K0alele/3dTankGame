@@ -21,6 +21,8 @@ namespace _3Dproject
         Matrix[] boneTransforms;
 
         Vector3 position;
+        Vector3 direction;
+        Vector3 gravity;
 
         float yaw, pitch, speed, scale;
 
@@ -28,19 +30,33 @@ namespace _3Dproject
         {            
             effect = _effect;
             BulletModel = _model;
-
+            
             boneTransforms = new Matrix[BulletModel.Bones.Count];
-            worldMatrix = Matrix.Identity;
+            worldMatrix = Matrix.Identity;            
 
-            scale = 0.5f;
+            scale = 0.2f;
             position = _position;
+            position.Y += 3.5f;
             yaw = _yaw;
             pitch = _pitch;
             speed = _speed;
+
+            gravity = Vector3.Zero;
+
+            direction.X = (float)Math.Cos(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * speed;
+            direction.Y = (float)Math.Sin(MathHelper.ToRadians(pitch)) * speed;
+            direction.Z = (float)Math.Sin(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * speed;
         }
+
+        public Vector3 returnPosition()
+        {
+            return position;
+        }
+
         public void Update()
         {
-
+            position += direction - gravity;
+            gravity.Y += 0.005f;
         }
 
         public void Draw()
@@ -57,11 +73,11 @@ namespace _3Dproject
                     effect.View = Game1.MainCamera.viewMatrix;
                     effect.World = boneTransforms[mesh.ParentBone.Index] * Matrix.CreateScale(scale) * Matrix.CreateTranslation(position);
 
-                    effect.LightingEnabled = true;
+                    effect.LightingEnabled = false;                    
 
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
-                }
+                }                
                 mesh.Draw();
             }                        
         }
