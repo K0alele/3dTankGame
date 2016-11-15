@@ -13,7 +13,7 @@ namespace _3Dproject
 {
     class Bullet
     {
-        BasicEffect effect;
+        BasicEffect basicEffect;
 
         Model BulletModel;
         Matrix worldMatrix;
@@ -26,9 +26,10 @@ namespace _3Dproject
 
         float yaw, pitch, speed, scale;
 
+        List<Vector3> prevPos = new List<Vector3>();
+
         public Bullet(BasicEffect _effect, Model _model, Vector3 _position, float _yaw, float _pitch, float _speed)
-        {            
-            effect = _effect;
+        {                        
             BulletModel = _model;
             
             boneTransforms = new Matrix[BulletModel.Bones.Count];
@@ -36,16 +37,16 @@ namespace _3Dproject
 
             scale = 0.2f;
             position = _position;
-            position.Y += 3.5f;
+            position.Y += 4f;
             yaw = _yaw;
             pitch = _pitch;
             speed = _speed;
 
             gravity = Vector3.Zero;
 
-            direction.X = (float)Math.Cos(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * speed;
-            direction.Y = (float)Math.Sin(MathHelper.ToRadians(pitch)) * speed;
-            direction.Z = (float)Math.Sin(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * speed;
+            direction.X = (float)Math.Cos(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(pitch) * speed;
+            direction.Y = (float)Math.Sin(pitch) * speed;
+            direction.Z = (float)Math.Sin(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(pitch) * speed;
         }
 
         public Vector3 returnPosition()
@@ -57,9 +58,10 @@ namespace _3Dproject
         {
             position += direction - gravity;
             gravity.Y += 0.005f;
+            prevPos.Add(position);
         }
 
-        public void Draw()
+        public void Draw(GraphicsDevice device)
         {         
             BulletModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180));           
 
@@ -79,7 +81,26 @@ namespace _3Dproject
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }                
                 mesh.Draw();
-            }                        
+            }
+
+            basicEffect = new BasicEffect(device);
+
+            for (int i = 0; i < prevPos.Count - 1; i++)
+            {
+                DrawVectors(device, prevPos[i], prevPos[i + 1], Color.OrangeRed);
+            }           
+        }
+
+        public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
+        {
+            basicEffect.Projection = Game1.MainCamera.projectionMatrix;
+            basicEffect.View = Game1.MainCamera.viewMatrix;
+            basicEffect.World = worldMatrix;
+            basicEffect.VertexColorEnabled = true;
+            basicEffect.CurrentTechnique.Passes[0].Apply();
+
+            VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
+            device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }
     }
 }

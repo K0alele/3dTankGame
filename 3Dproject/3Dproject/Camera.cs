@@ -34,7 +34,7 @@ namespace _3Dproject
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.3f, 1000.0f);
         }
 
-        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue)
+        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue , Vector3 _TankPosition)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -148,7 +148,7 @@ namespace _3Dproject
 
                     PrevScrollWeelValue = scrollValue;
 
-                    Vector3 tankPos = Game1.MainTank.returnPosition();
+                    Vector3 tankPos = _TankPosition;
 
                     pos = Vector3.Transform(new Vector3((tankPos.X - cameraDistance),
                         tankPos.Y + cameraDistance,
