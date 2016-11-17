@@ -17,10 +17,10 @@ namespace _3Dproject
         BasicEffect basicEffect;
         //TESTE
 
-        BasicEffect effect;        
+        protected BasicEffect effect;        
 
         Model tankModel;
-        Model Bullet;
+        protected Model Bullet;
         Matrix worldMatrix;
 
         ModelBone turretBone;
@@ -37,26 +37,29 @@ namespace _3Dproject
 
         Matrix[] boneTransforms;
         
-        float scale, steerMult = 1;
-        private float turretYaw = 0f;
-        private float canonPitch = 0f;
+        protected float scale, steerMult = 1, HP = 100;
+        protected float turretYaw = 0f;
+        protected float canonPitch = 0f;
 
         string[] wheelNames = { "l_front_wheel_geo", "r_front_wheel_geo", "l_back_wheel_geo", "r_back_wheel_geo" };
         string[] steerNames = { "r_steer_geo", "l_steer_geo" };
 
-        private float TankYaw = 0f, steerYaw = 0, hatchRotation = 0, TankPitch = 0;
-        private float[] wheelsRotation;
-        private float limitZ, limitX;       
+        protected float TankYaw = 0f, steerYaw = 0, hatchRotation = 0, TankPitch = 0;
+        protected float[] wheelsRotation;
+        protected float limitZ, limitX;       
 
-        private Vector3 position;
+        protected Vector3 position;
 
-        List<Bullet> bulletList;
-        Keys[] movementKeys;
+        protected List<Bullet> bulletList;
+        protected Keys[] movementKeys;
 
-        KeyboardState prevKeyboard;
-        private Vector3 tankFront;
-        private Vector3 tankNormal = Vector3.Zero;
-        private Matrix inclinationMatrix = Matrix.Identity;
+        protected KeyboardState prevKeyboard;
+        protected Vector3 BulletTrajectory = Vector3.Zero;
+
+        public BoundingSphere Sphere;
+        
+        int a = 0;
+        private float raio = MathHelper.Pi + MathHelper.E / 3;
 
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position, Keys[] _movementKeys)
         {
@@ -104,11 +107,37 @@ namespace _3Dproject
             worldMatrix = Matrix.Identity;
             prevKeyboard = Keyboard.GetState();
             bulletList = new List<Bullet>();
+
+            Sphere = new BoundingSphere(position, raio);
+        }
+
+        public bool collides()
+        {
+            Sphere.Center = position;
+            foreach (var item in Game1.TankList)
+            {
+                if (item != this)
+                {
+                    Vector3 distance = Sphere.Center - item.Sphere.Center;
+                    if (distance.Length() <= 8)
+                    {
+                        Debug.WriteLine("I COLIDE " + a);
+                        a++;
+                        return true;
+                    }                      
+                }
+            }
+            return false;
         }
 
         public Vector3 returnPosition()
         {
             return position;
+        }
+
+        public void GotHit()
+        {
+            HP -= 10;
         }
 
         public float[] addArrays(float[] a1, float[] a2)
@@ -120,128 +149,19 @@ namespace _3Dproject
             return result;
         }
 
-        public void Update()
-        {
-            KeyboardState keyboardState = Keyboard.GetState();
-
-            if (keyboardState.IsKeyDown(Keys.Up))
-                canonPitch += 2f;
-            if (keyboardState.IsKeyDown(Keys.Down))
-                canonPitch -= 2f;
-            if (keyboardState.IsKeyDown(Keys.Right))
-                turretYaw -= 2.5f;
-            if (keyboardState.IsKeyDown(Keys.Left))
-                turretYaw += 2.5f;
-
-            if (keyboardState.IsKeyDown(movementKeys[0]))
-            {
-                TankYaw += 2f;
-                steerYaw += 5f * steerMult;
-                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
-                {
-                    wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, 5f });
-                    steerMult = -1f;
-                    steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
-                }
-                else
-                {
-                    if (steerYaw > 30)                    
-                        steerYaw -= 5f;                    
-                    if (steerYaw < -30)                    
-                        steerYaw += 5f;                    
-                }                
-            }
-            if (keyboardState.IsKeyDown(movementKeys[1]))
-            {
-                TankYaw -= 2f;
-                steerYaw -= 5f * steerMult;
-                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
-                {
-                    wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, 5f, -5f });
-                    steerMult = -1f;
-                    steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
-                }
-                else
-                {
-                    if (steerYaw > 30)                    
-                        steerYaw -= 5f;                    
-                    if (steerYaw < -30)                    
-                        steerYaw += 5f;                    
-                }
-
-            }
-
-            if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
-            {
-                if (steerYaw > 0)
-                    steerYaw -= 5f;
-                else if (steerYaw < 0)
-                    steerYaw += 5f;
-            }
-
-            if (keyboardState.IsKeyDown(movementKeys[2]))
-            {
-                position.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
-                position.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
-                wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
-                steerMult = 1f;
-
-            }
-            if (keyboardState.IsKeyDown(movementKeys[3]))
-            {
-                position.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
-                position.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
-                wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
-                steerMult = -1f;
-            }
-
-            if (keyboardState.IsKeyDown(Keys.O))
-                hatchRotation += 2f;
-            else if (keyboardState.IsKeyDown(Keys.I))
-                hatchRotation -= 2f;
-
-            if (keyboardState.IsKeyDown(movementKeys[4]) && !prevKeyboard.IsKeyDown(movementKeys[4]))
-            {
-                bulletList.Add(new Bullet(effect, Bullet, position + tankNormal+ tankFront, TankYaw + turretYaw,MathHelper.ToRadians(canonPitch), 0.5f));
-            }
-
-            float minHeight = Game1.terrain.retCameraHeight(position);
-
-            for (int i = 0; i < bulletList.Count; i++)
-            {                
-                Vector3 pos = bulletList[i].returnPosition();
-                if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ)
-                    bulletList.Remove(bulletList[i]);
-                else bulletList[i].Update();
-            }  
-                
-            hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
-
-            canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
-
-            position.X = MathHelper.Clamp(position.X, 0, limitX);
-            position.Z = MathHelper.Clamp(position.Z, 0, limitZ);
-           
-            tankNormal = Game1.terrain.retTerrainNormal(position);
-
-            prevKeyboard = keyboardState;
-
-            position.Y = minHeight;
-        }
-
         public void Draw(GraphicsDevice device)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
-            tankNormal = Game1.terrain.retTerrainNormal(position);
+            Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
-            tankFront = Vector3.Cross(tankNormal, tankRight);
+            Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
 
-            inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
+            Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
-
-            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw )) * turretTransform;
+      
+            turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
@@ -271,17 +191,20 @@ namespace _3Dproject
             foreach (var item in bulletList)            
                 item.Draw(device);
 
-            if (direction.Y >= tankFront.Y)            
-                TankPitch = -(float)Math.Acos((direction.X * tankFront.X + direction.Y * tankFront.Y + direction.Z * tankFront.Z) / direction.Length() * tankFront.Length());            
-            else TankPitch = (float)Math.Acos((direction.X * tankFront.X + direction.Y * tankFront.Y + direction.Z * tankFront.Z) / direction.Length() * tankFront.Length());            
-            
-            Debug.WriteLine("Angle : " + MathHelper.ToDegrees(TankPitch));
-
+            BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight, MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal, MathHelper.ToRadians(turretYaw)));
+            Debug.WriteLine("HP: " + HP);
             //TEST  
-            DrawVectors(device, position, position + tankNormal, Color.Red);
-            DrawVectors(device, position, position + tankRight, Color.Green);
-            DrawVectors(device, position, position + tankFront, Color.White);
-            DrawVectors(device, position, position + direction, Color.HotPink);
+            //DrawVectors(device, position, position + tankNormal, Color.Red);
+            //DrawVectors(device, position, position + tankRight, Color.Green);
+            //DrawVectors(device, position, position + tankFront, Color.White);
+            //DrawVectors(device, position, position + direction, Color.HotPink);
+            //DrawVectors(device,position,position + BulletTrajectory, Color.LightBlue);
+            DrawVectors(device, position, position + new Vector3(raio,0,0), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(-raio, 0, 0), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(0, raio, 0), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(0, -raio, 0), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(0, 0, raio), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(0, 0, -raio), Color.HotPink);
             //TEST
         }
 
@@ -292,8 +215,8 @@ namespace _3Dproject
             basicEffect.World = worldMatrix;
             basicEffect.VertexColorEnabled = true;
             basicEffect.CurrentTechnique.Passes[0].Apply();
-            startPoint.Y += 4;
-            endPoint.Y += 4;
+            //startPoint.Y += 4;
+            //endPoint.Y += 4;
             VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
             device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }

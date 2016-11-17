@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace _3Dproject
 {
-    class Bullet
+    public class Bullet
     {
         BasicEffect basicEffect;
 
@@ -24,11 +24,14 @@ namespace _3Dproject
         Vector3 direction;
         Vector3 gravity;
 
-        float yaw, pitch, speed, scale;
+        float yaw, pitch, speed, scale, raio = 0.21f;
+        public bool hit = false;
 
         List<Vector3> prevPos = new List<Vector3>();
 
-        public Bullet(BasicEffect _effect, Model _model, Vector3 _position, float _yaw, float _pitch, float _speed)
+        BoundingSphere c;
+        
+        public Bullet(BasicEffect _effect, Model _model, Vector3 _position , Vector3 _direction, float _speed)
         {                        
             BulletModel = _model;
             
@@ -37,16 +40,13 @@ namespace _3Dproject
 
             scale = 0.2f;
             position = _position;
+            direction = _direction;
             position.Y += 4f;
-            yaw = _yaw;
-            pitch = _pitch;
             speed = _speed;
 
             gravity = Vector3.Zero;
 
-            direction.X = (float)Math.Cos(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(pitch) * speed;
-            direction.Y = (float)Math.Sin(pitch) * speed;
-            direction.Z = (float)Math.Sin(MathHelper.ToRadians(-yaw + 90)) * (float)Math.Cos(pitch) * speed;
+            c = new BoundingSphere(_position, raio);       
         }
 
         public Vector3 returnPosition()
@@ -56,9 +56,25 @@ namespace _3Dproject
 
         public void Update()
         {
+            c.Center = position;
             position += direction - gravity;
             gravity.Y += 0.005f;
+            collides();
             prevPos.Add(position);
+        }
+
+        public void collides()
+        {
+            c.Center = position;
+            foreach (var item in Game1.TankList)
+            {
+                Vector3 distance = c.Center - item.Sphere.Center;
+                if (distance.Length() <= raio + item.Sphere.Radius)
+                {
+                    item.GotHit();
+                    hit = true;                 
+                }
+            }
         }
 
         public void Draw(GraphicsDevice device)
@@ -88,7 +104,7 @@ namespace _3Dproject
             for (int i = 0; i < prevPos.Count - 1; i++)
             {
                 DrawVectors(device, prevPos[i], prevPos[i + 1], Color.OrangeRed);
-            }           
+            }
         }
 
         public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace _3Dproject
@@ -13,8 +14,7 @@ namespace _3Dproject
         
         public static Camera MainCamera;
         public static Terrain terrain;
-        public static Tank MainTank;
-        public static Tank EnemyTank;
+        public static List<PlayerTank> TankList;
 
         Vector2 half;        
 
@@ -34,8 +34,9 @@ namespace _3Dproject
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
-            MainTank = new Tank(GraphicsDevice, Content, new Vector3(10, 0, 10), new[] { Keys.A, Keys.D, Keys.W , Keys.S, Keys.Space});
-            EnemyTank = new Tank(GraphicsDevice, Content, new Vector3(10, 0, 10), new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter});
+            TankList = new List<PlayerTank>();
+            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
+            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(20, 0, 10), new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
 
             this.IsMouseVisible = false;
             base.Initialize();
@@ -68,9 +69,10 @@ namespace _3Dproject
                 MouseState mouseState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);                               
 
-                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, MainTank.returnPosition());
-                MainTank.Update();
-                EnemyTank.Update();
+                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, TankList[0].returnPosition());
+
+                foreach (PlayerTank item in TankList)                
+                    item.Update();                                    
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);
@@ -82,8 +84,8 @@ namespace _3Dproject
             GraphicsDevice.Clear(Color.LightGray);
 
             terrain.Draw(GraphicsDevice);
-            EnemyTank.Draw(GraphicsDevice);            
-            MainTank.Draw(GraphicsDevice);
+            foreach (PlayerTank item in TankList)
+                item.Draw(GraphicsDevice);
 
             base.Draw(gameTime);
         }
