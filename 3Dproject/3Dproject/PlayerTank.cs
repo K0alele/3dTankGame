@@ -13,7 +13,7 @@ namespace _3Dproject
 {
     public class PlayerTank : Tank
     {
-        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, Keys[] _movementKeys) : base(device, content, _position, _movementKeys)
+        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys) : base(device, content, _position,_id ,_movementKeys)
         {
 
         }
@@ -101,7 +101,7 @@ namespace _3Dproject
 
             if (keyboardState.IsKeyDown(movementKeys[4]) && !prevKeyboard.IsKeyDown(movementKeys[4]))
             {
-                bulletList.Add(new Bullet(effect, Bullet, position, BulletTrajectory, 0.5f));
+                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos, BulletTrajectory, ID,0.1f));
             }
 
             float minHeight = Game1.terrain.retCameraHeight(position);
@@ -123,8 +123,8 @@ namespace _3Dproject
 
             canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
 
-            position.X = MathHelper.Clamp(position.X, 0, limitX);
-            position.Z = MathHelper.Clamp(position.Z, 0, limitZ);
+            position.X = MathHelper.Clamp(position.X, Sphere.Radius, limitX - Sphere.Radius);
+            position.Z = MathHelper.Clamp(position.Z, Sphere.Radius, limitZ - Sphere.Radius);
 
             prevKeyboard = keyboardState;
 

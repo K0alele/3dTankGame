@@ -35,8 +35,8 @@ namespace _3Dproject
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<PlayerTank>();
-            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
-            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(20, 0, 10), new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
+            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
+            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(20, 0, 10), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
 
             this.IsMouseVisible = false;
             base.Initialize();
@@ -72,7 +72,7 @@ namespace _3Dproject
                 MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, TankList[0].returnPosition());
 
                 foreach (PlayerTank item in TankList)                
-                    item.Update();                                    
+                    item.Update();
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);

@@ -49,19 +49,21 @@ namespace _3Dproject
         protected float limitZ, limitX;
 
         protected Vector3 position;
+        protected Vector3 BulletTrajectory = Vector3.Zero;
+        List<Vector3> BulletPath = new List<Vector3>();        
 
-        protected List<Bullet> bulletList;
+        protected static List<Bullet> bulletList;
         protected Keys[] movementKeys;
 
-        protected KeyboardState prevKeyboard;
-        protected Vector3 BulletTrajectory = Vector3.Zero;
+        protected KeyboardState prevKeyboard;        
 
         public BoundingSphere Sphere;
 
-        int a = 0;
+        protected int ID;
         private float raio = MathHelper.Pi + MathHelper.E / 3;
+        protected Vector3 cannonPos = Vector3.Zero;
 
-        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position, Keys[] _movementKeys)
+        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
         {
             scale = 0.01f;
             position = _position;
@@ -69,6 +71,7 @@ namespace _3Dproject
             basicEffect = new BasicEffect(device);
             //TEST
 
+            ID = _id;
             movementKeys = _movementKeys;
 
             effect = new BasicEffect(device);
@@ -107,7 +110,12 @@ namespace _3Dproject
             prevKeyboard = Keyboard.GetState();
             bulletList = new List<Bullet>();
 
-            Sphere = new BoundingSphere(position, raio);
+            foreach (var item in tankModel.Meshes)
+            {
+                Sphere = BoundingSphere.CreateMerged(Sphere, new BoundingSphere(new Vector3(item.BoundingSphere.Center.X * scale, item.BoundingSphere.Center.Y * scale, item.BoundingSphere.Center.Z * scale), item.BoundingSphere.Radius * scale));
+            }
+
+            //Sphere = new BoundingSphere(position, raio);
         }
 
         public bool collides(Vector3 _center)
@@ -118,16 +126,12 @@ namespace _3Dproject
                 if (other != this)
                 {
                     Vector3 distance = Sphere.Center - other.Sphere.Center;
-                    if (distance.Length() <= Sphere.Radius + other.Sphere.Radius)
-                    {
-                        Debug.WriteLine("I COLIDE " + a);
-                        a++;
-                        return true;
-                    }
+                    if (distance.Length() <= Sphere.Radius + other.Sphere.Radius)                    
+                        return true;                    
                 }
             }
             return false;
-        }
+        }        
 
         public void GotHit()
         {
@@ -137,7 +141,7 @@ namespace _3Dproject
         public Vector3 returnPosition()
         {
             return position;
-        }
+        }        
 
         public float[] addArrays(float[] a1, float[] a2)
         {
@@ -184,28 +188,33 @@ namespace _3Dproject
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }
-                mesh.Draw();
+                mesh.Draw();                
             }
 
             foreach (var item in bulletList)
                 item.Draw(device);
 
-            BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
+            BulletTrajectory =  Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
                                                 MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal,
                                                 MathHelper.ToRadians(turretYaw)));
-            Debug.WriteLine("HP: " + HP);
-            //TEST  
+
+            cannonPos = boneTransforms[tankModel.Meshes["canon_geo"].ParentBone.Index].Translation * scale;
+
+            Debug.WriteLine("HP : " + HP);
+
+            //TEST
+            //DrawVectors(device, position, position + cannonPos, Color.Red);         
             //DrawVectors(device, position, position + tankNormal, Color.Red);
             //DrawVectors(device, position, position + tankRight, Color.Green);
             //DrawVectors(device, position, position + tankFront, Color.White);
             //DrawVectors(device, position, position + direction, Color.HotPink);
-            //DrawVectors(device,position,position + BulletTrajectory, Color.LightBlue);
-            DrawVectors(device, position, position + new Vector3(raio, 0, 0), Color.HotPink);
-            DrawVectors(device, position, position + new Vector3(-raio, 0, 0), Color.HotPink);
-            DrawVectors(device, position, position + new Vector3(0, raio, 0), Color.HotPink);
-            DrawVectors(device, position, position + new Vector3(0, -raio, 0), Color.HotPink);
-            DrawVectors(device, position, position + new Vector3(0, 0, raio), Color.HotPink);
-            DrawVectors(device, position, position + new Vector3(0, 0, -raio), Color.HotPink);
+            //DrawVectors(device, position, position + BulletTrajectory, Color.LightBlue);
+            //DrawVectors(device, position, position + new Vector3(raio, 0, 0), Color.HotPink);
+            //DrawVectors(device, position, position + new Vector3(-raio, 0, 0), Color.HotPink);
+            //DrawVectors(device, position, position + new Vector3(0, raio, 0), Color.HotPink);
+            //DrawVectors(device, position, position + new Vector3(0, -raio, 0), Color.HotPink);
+            //DrawVectors(device, position, position + new Vector3(0, 0, raio), Color.HotPink);
+            //DrawVectors(device, position, position + new Vector3(0, 0, -raio), Color.HotPink);
             //TEST
         }
 

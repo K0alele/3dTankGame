@@ -26,12 +26,14 @@ namespace _3Dproject
 
         float yaw, pitch, speed, scale, raio = 0.21f;
         public bool hit = false;
+        private bool saiu = false;
+        private int TankId;
 
         List<Vector3> prevPos = new List<Vector3>();
 
         BoundingSphere c;
         
-        public Bullet(BasicEffect _effect, Model _model, Vector3 _position , Vector3 _direction, float _speed)
+        public Bullet(BasicEffect _effect, Model _model, Vector3 _position , Vector3 _direction,int _TankId, float _speed)
         {                        
             BulletModel = _model;
             
@@ -40,9 +42,9 @@ namespace _3Dproject
 
             scale = 0.2f;
             position = _position;
-            direction = _direction;
-            position.Y += 4f;
+            direction = _direction;          
             speed = _speed;
+            TankId = _TankId;
 
             gravity = Vector3.Zero;
 
@@ -57,7 +59,7 @@ namespace _3Dproject
         public void Update()
         {
             c.Center = position;
-            position += direction - gravity;
+            position += (direction - gravity) * speed;
             gravity.Y += 0.005f;
             collides();
             prevPos.Add(position);
@@ -71,8 +73,15 @@ namespace _3Dproject
                 Vector3 distance = c.Center - item.Sphere.Center;
                 if (distance.Length() <= raio + item.Sphere.Radius)
                 {
-                    item.GotHit();
-                    hit = true;                 
+                    if (saiu)
+                    {
+                        item.GotHit();
+                        hit = true;
+                    }                                         
+                }
+                if (TankId == Game1.TankList.IndexOf(item) && distance.Length() >= raio + item.Sphere.Radius)
+                {
+                    saiu = true;
                 }
             }
         }
