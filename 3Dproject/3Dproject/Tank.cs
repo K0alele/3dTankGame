@@ -17,7 +17,7 @@ namespace _3Dproject
         BasicEffect basicEffect;
         //TESTE
 
-        protected BasicEffect effect;        
+        protected BasicEffect effect;
 
         Model tankModel;
         protected Model Bullet;
@@ -36,7 +36,7 @@ namespace _3Dproject
         Matrix hatchtransform;
 
         Matrix[] boneTransforms;
-        
+
         protected float scale, steerMult = 1, HP = 100;
         protected float turretYaw = 0f;
         protected float canonPitch = 0f;
@@ -46,7 +46,7 @@ namespace _3Dproject
 
         protected float TankYaw = 0f, steerYaw = 0, hatchRotation = 0, TankPitch = 0;
         protected float[] wheelsRotation;
-        protected float limitZ, limitX;       
+        protected float limitZ, limitX;
 
         protected Vector3 position;
 
@@ -57,7 +57,7 @@ namespace _3Dproject
         protected Vector3 BulletTrajectory = Vector3.Zero;
 
         public BoundingSphere Sphere;
-        
+
         int a = 0;
         private float raio = MathHelper.Pi + MathHelper.E / 3;
 
@@ -77,14 +77,13 @@ namespace _3Dproject
             Bullet = content.Load<Model>("Bullet/Sphere");
 
             effect.LightingEnabled = true;
-
             effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
             effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
 
             turretBone = tankModel.Bones["turret_geo"];
             cannonBone = tankModel.Bones["canon_geo"];
             hatchBone = tankModel.Bones["hatch_geo"];
-            
+
             for (int i = 0; i < wheelsBones.Length; i++)
                 wheelsBones[i] = tankModel.Bones[wheelNames[i]];
             for (int i = 0; i < steerBones.Length; i++)
@@ -124,15 +123,10 @@ namespace _3Dproject
                         Debug.WriteLine("I COLIDE " + a);
                         a++;
                         return true;
-                    }                      
+                    }
                 }
             }
             return false;
-        }
-
-        public Vector3 returnPosition()
-        {
-            return position;
         }
 
         public void GotHit()
@@ -140,12 +134,17 @@ namespace _3Dproject
             HP -= 10;
         }
 
+        public Vector3 returnPosition()
+        {
+            return position;
+        }
+
         public float[] addArrays(float[] a1, float[] a2)
         {
             float[] result = new float[a1.Length];
 
-            for (int i = 0; i < a1.Length; i++)            
-                result[i] = a1[i] + a2[i];            
+            for (int i = 0; i < a1.Length; i++)
+                result[i] = a1[i] + a2[i];
             return result;
         }
 
@@ -160,15 +159,15 @@ namespace _3Dproject
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
-      
+
             turretBone.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(turretYaw)) * turretTransform;
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
-            for (int i = 0; i < wheelsBones.Length; i++)            
-                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];            
-            for (int i = 0; i < steerBones.Length; i++)            
-                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];            
+            for (int i = 0; i < wheelsBones.Length; i++)
+                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];
+            for (int i = 0; i < steerBones.Length; i++)
+                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
 
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
@@ -185,13 +184,15 @@ namespace _3Dproject
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }
-                mesh.Draw();            
+                mesh.Draw();
             }
 
-            foreach (var item in bulletList)            
+            foreach (var item in bulletList)
                 item.Draw(device);
 
-            BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight, MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal, MathHelper.ToRadians(turretYaw)));
+            BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
+                                                MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal,
+                                                MathHelper.ToRadians(turretYaw)));
             Debug.WriteLine("HP: " + HP);
             //TEST  
             //DrawVectors(device, position, position + tankNormal, Color.Red);
@@ -199,7 +200,7 @@ namespace _3Dproject
             //DrawVectors(device, position, position + tankFront, Color.White);
             //DrawVectors(device, position, position + direction, Color.HotPink);
             //DrawVectors(device,position,position + BulletTrajectory, Color.LightBlue);
-            DrawVectors(device, position, position + new Vector3(raio,0,0), Color.HotPink);
+            DrawVectors(device, position, position + new Vector3(raio, 0, 0), Color.HotPink);
             DrawVectors(device, position, position + new Vector3(-raio, 0, 0), Color.HotPink);
             DrawVectors(device, position, position + new Vector3(0, raio, 0), Color.HotPink);
             DrawVectors(device, position, position + new Vector3(0, -raio, 0), Color.HotPink);

@@ -13,10 +13,10 @@ namespace _3Dproject
 {
     public class PlayerTank : Tank
     {
-        public PlayerTank (GraphicsDevice device, ContentManager content, Vector3 _position, Keys[] _movementKeys) : base(device,content,_position , _movementKeys)
+        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, Keys[] _movementKeys) : base(device, content, _position, _movementKeys)
         {
 
-        }       
+        }
 
         public void Update()
         {
@@ -84,8 +84,8 @@ namespace _3Dproject
                 position.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
-
             }
+
             if (keyboardState.IsKeyDown(movementKeys[3]))
             {
                 position.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
@@ -100,7 +100,7 @@ namespace _3Dproject
                 hatchRotation -= 2f;
 
             if (keyboardState.IsKeyDown(movementKeys[4]) && !prevKeyboard.IsKeyDown(movementKeys[4]))
-            {                
+            {
                 bulletList.Add(new Bullet(effect, Bullet, position, BulletTrajectory, 0.5f));
             }
 

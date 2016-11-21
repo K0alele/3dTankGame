@@ -37,7 +37,7 @@ namespace _3Dproject
             effect.TextureEnabled = true;
             effect.Texture = texture;
             effect.LightingEnabled = true;
-           
+
             effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
             effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
             worldMatrix = Matrix.Identity;
@@ -146,127 +146,126 @@ namespace _3Dproject
             // Primeira Linha
             for (int x = 1; x < Width - 1; x++)
             {
-                for (int y = 0; y < Height; y += Height)
-                {
-                    int id5 = x + 0 + (y + 0) * Width;
+                int y = 0;
+                int id5 = x + 0 + (y + 0) * Width;
 
-                    int id4 = x - 1 + (y + 0) * Width;
-                    int id6 = x + 1 + (y + 0) * Width;
-                    int id7 = x - 1 + (y + 1) * Width;
-                    int id8 = x + 0 + (y + 1) * Width;
-                    int id9 = x + 1 + (y + 1) * Width;
+                int id4 = x - 1 + (y + 0) * Width;
+                int id6 = x + 1 + (y + 0) * Width;
+                int id7 = x - 1 + (y + 1) * Width;
+                int id8 = x + 0 + (y + 1) * Width;
+                int id9 = x + 1 + (y + 1) * Width;
 
-                    Vector3 Length1 = vertices[id5].Position - vertices[id6].Position;
-                    Vector3 Length2 = vertices[id5].Position - vertices[id9].Position;
-                    Vector3 Length3 = vertices[id5].Position - vertices[id8].Position;
-                    Vector3 Length4 = vertices[id5].Position - vertices[id7].Position;
-                    Vector3 Length5 = vertices[id5].Position - vertices[id4].Position;
+                Vector3 Length1 = vertices[id5].Position - vertices[id6].Position;
+                Vector3 Length2 = vertices[id5].Position - vertices[id9].Position;
+                Vector3 Length3 = vertices[id5].Position - vertices[id8].Position;
+                Vector3 Length4 = vertices[id5].Position - vertices[id7].Position;
+                Vector3 Length5 = vertices[id5].Position - vertices[id4].Position;
 
-                    Vector3 normal3 = Vector3.Cross(Length2, Length1);
-                    Vector3 normal4 = Vector3.Cross(Length3, Length2);
-                    Vector3 normal5 = Vector3.Cross(Length4, Length3);
-                    Vector3 normal6 = Vector3.Cross(Length5, Length4);
+                Vector3 normal3 = Vector3.Cross(Length2, Length1);
+                Vector3 normal4 = Vector3.Cross(Length3, Length2);
+                Vector3 normal5 = Vector3.Cross(Length4, Length3);
+                Vector3 normal6 = Vector3.Cross(Length5, Length4);
 
 
-                    Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
-                    media.Normalize();
-                    vertices[id5].Normal = media;
-                    NormalData[x, y] = media;
-                }
+                Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
+                media.Normalize();
+                vertices[id5].Normal = media;
+                NormalData[x, y] = media;
+
             }
             // Ultima Linha
             for (int x = 1; x < Width - 1; x++)
             {
-                for (int y = Height - 1; y < Height; y++)
-                {
-                    int id5 = x + 0 + (y + 0) * Width;
+                int y = Height - 1;
 
-                    int id1 = x - 1 + (y - 1) * Width;
-                    int id2 = x + 0 + (y - 1) * Width;
-                    int id3 = x + 1 + (y - 1) * Width;
-                    int id4 = x - 1 + (y + 0) * Width;
-                    int id6 = x + 1 + (y + 0) * Width;
+                int id5 = x + 0 + (y + 0) * Width;
 
-                    Vector3 Length1 = vertices[id5].Position - vertices[id1].Position;
-                    Vector3 Length2 = vertices[id5].Position - vertices[id2].Position;
-                    Vector3 Length3 = vertices[id5].Position - vertices[id3].Position;
-                    Vector3 Length4 = vertices[id5].Position - vertices[id4].Position;
-                    Vector3 Length5 = vertices[id5].Position - vertices[id6].Position;
+                int id1 = x - 1 + (y - 1) * Width;
+                int id2 = x + 0 + (y - 1) * Width;
+                int id3 = x + 1 + (y - 1) * Width;
+                int id4 = x - 1 + (y + 0) * Width;
+                int id6 = x + 1 + (y + 0) * Width;
 
-                    Vector3 normal3 = Vector3.Cross(Length2, Length1);
-                    Vector3 normal4 = Vector3.Cross(Length3, Length2);
-                    Vector3 normal5 = Vector3.Cross(Length4, Length3);
-                    Vector3 normal6 = Vector3.Cross(Length5, Length4);
+                Vector3 Length1 = vertices[id5].Position - vertices[id1].Position;
+                Vector3 Length2 = vertices[id5].Position - vertices[id2].Position;
+                Vector3 Length3 = vertices[id5].Position - vertices[id3].Position;
+                Vector3 Length4 = vertices[id5].Position - vertices[id4].Position;
+                Vector3 Length5 = vertices[id5].Position - vertices[id6].Position;
 
-                    Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
-                    media.Normalize();
-                    vertices[id5].Normal = media;
-                    NormalData[x, y] = media;
-                }
+                Vector3 normal3 = Vector3.Cross(Length2, Length1);
+                Vector3 normal4 = Vector3.Cross(Length3, Length2);
+                Vector3 normal5 = Vector3.Cross(Length4, Length3);
+                Vector3 normal6 = Vector3.Cross(Length5, Length4);
+
+                Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
+                media.Normalize();
+                vertices[id5].Normal = media;
+                NormalData[x, y] = media;
+
             }
 
             //Priemira Coluna
             for (int y = 1; y < Height - 1; y++)
             {
-                for (int x = 0; x < Height - 1; x += Width)
-                {
-                    int id5 = x + 0 + (y + 0) * Width;
+                int x = 0;
 
-                    int id2 = x + 0 + (y - 1) * Width;
-                    int id3 = x + 1 + (y - 1) * Width;
-                    int id6 = x + 1 + (y + 0) * Width;
-                    int id8 = x + 0 + (y + 1) * Width;
-                    int id9 = x + 1 + (y + 1) * Width;
+                int id5 = x + 0 + (y + 0) * Width;
 
-                    Vector3 Length1 = vertices[id5].Position - vertices[id2].Position;
-                    Vector3 Length2 = vertices[id5].Position - vertices[id3].Position;
-                    Vector3 Length3 = vertices[id5].Position - vertices[id6].Position;
-                    Vector3 Length4 = vertices[id5].Position - vertices[id9].Position;
-                    Vector3 Length5 = vertices[id5].Position - vertices[id8].Position;
+                int id2 = x + 0 + (y - 1) * Width;
+                int id3 = x + 1 + (y - 1) * Width;
+                int id6 = x + 1 + (y + 0) * Width;
+                int id8 = x + 0 + (y + 1) * Width;
+                int id9 = x + 1 + (y + 1) * Width;
 
-                    Vector3 normal3 = Vector3.Cross(Length2, Length1);
-                    Vector3 normal4 = Vector3.Cross(Length3, Length2);
-                    Vector3 normal5 = Vector3.Cross(Length4, Length3);
-                    Vector3 normal6 = Vector3.Cross(Length5, Length4);
+                Vector3 Length1 = vertices[id5].Position - vertices[id2].Position;
+                Vector3 Length2 = vertices[id5].Position - vertices[id3].Position;
+                Vector3 Length3 = vertices[id5].Position - vertices[id6].Position;
+                Vector3 Length4 = vertices[id5].Position - vertices[id9].Position;
+                Vector3 Length5 = vertices[id5].Position - vertices[id8].Position;
+
+                Vector3 normal3 = Vector3.Cross(Length2, Length1);
+                Vector3 normal4 = Vector3.Cross(Length3, Length2);
+                Vector3 normal5 = Vector3.Cross(Length4, Length3);
+                Vector3 normal6 = Vector3.Cross(Length5, Length4);
 
 
-                    Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
-                    media.Normalize();
-                    vertices[id5].Normal = media;
-                    NormalData[x, y] = media;
-                }
+                Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
+                media.Normalize();
+                vertices[id5].Normal = media;
+                NormalData[x, y] = media;
+
             }
 
             //Ultima coluna
             for (int y = 1; y < Height - 1; y++)
             {
-                for (int x = Width - 1; x < Height; x += Width)
-                {
-                    int id5 = x + 0 + (y + 0) * Width;
+                int x = Width - 1;
 
-                    int id1 = x - 1 + (y - 1) * Width;
-                    int id2 = x + 0 + (y - 1) * Width;
-                    int id4 = x - 1 + (y + 0) * Width;
-                    int id7 = x - 1 + (y + 1) * Width;
-                    int id8 = x + 0 + (y + 1) * Width;
+                int id5 = x + 0 + (y + 0) * Width;
 
-                    Vector3 Length1 = vertices[id5].Position - vertices[id8].Position;
-                    Vector3 Length2 = vertices[id5].Position - vertices[id7].Position;
-                    Vector3 Length3 = vertices[id5].Position - vertices[id4].Position;
-                    Vector3 Length4 = vertices[id5].Position - vertices[id1].Position;
-                    Vector3 Length5 = vertices[id5].Position - vertices[id2].Position;
+                int id1 = x - 1 + (y - 1) * Width;
+                int id2 = x + 0 + (y - 1) * Width;
+                int id4 = x - 1 + (y + 0) * Width;
+                int id7 = x - 1 + (y + 1) * Width;
+                int id8 = x + 0 + (y + 1) * Width;
 
-                    Vector3 normal3 = Vector3.Cross(Length2, Length1);
-                    Vector3 normal4 = Vector3.Cross(Length3, Length2);
-                    Vector3 normal5 = Vector3.Cross(Length4, Length3);
-                    Vector3 normal6 = Vector3.Cross(Length5, Length4);
+                Vector3 Length1 = vertices[id5].Position - vertices[id8].Position;
+                Vector3 Length2 = vertices[id5].Position - vertices[id7].Position;
+                Vector3 Length3 = vertices[id5].Position - vertices[id4].Position;
+                Vector3 Length4 = vertices[id5].Position - vertices[id1].Position;
+                Vector3 Length5 = vertices[id5].Position - vertices[id2].Position;
+
+                Vector3 normal3 = Vector3.Cross(Length2, Length1);
+                Vector3 normal4 = Vector3.Cross(Length3, Length2);
+                Vector3 normal5 = Vector3.Cross(Length4, Length3);
+                Vector3 normal6 = Vector3.Cross(Length5, Length4);
 
 
-                    Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
-                    media.Normalize();
-                    vertices[id5].Normal = media;
-                    NormalData[x, y] = media;
-                }
+                Vector3 media = (normal3 + normal4 + normal5 + normal6) / 4;
+                media.Normalize();
+                vertices[id5].Normal = media;
+                NormalData[x, y] = media;
+
             }
 
             //Meio
@@ -359,7 +358,7 @@ namespace _3Dproject
             Nmedia.Normalize();
             vertices[Nid5].Normal = Nmedia;
             NormalData[x1, y1] = Nmedia;
-            
+
             //Canto 0, Height
             x1 = 0;
             y1 = Height - 1;
