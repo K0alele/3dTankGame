@@ -22,7 +22,7 @@ namespace _3Dproject
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
-            bool col = collides();
+            Vector3 direction = Vector3.Zero;
 
             if (keyboardState.IsKeyDown(Keys.Up))
                 canonPitch += 2f;
@@ -80,16 +80,16 @@ namespace _3Dproject
 
             if (keyboardState.IsKeyDown(movementKeys[2]))
             {
-                position.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
-                position.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
+                direction.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
+                direction.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
-            }
 
+            }
             if (keyboardState.IsKeyDown(movementKeys[3]))
             {
-                position.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
-                position.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
+                direction.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
+                direction.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
             }
@@ -114,6 +114,11 @@ namespace _3Dproject
                 else bulletList[i].Update();
             }
 
+            bool col = collides(position + direction);
+
+            if (!col)
+                position += direction;
+
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
             canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
@@ -127,3 +132,4 @@ namespace _3Dproject
         }
     }
 }
+

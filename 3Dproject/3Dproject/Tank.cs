@@ -110,15 +110,15 @@ namespace _3Dproject
             Sphere = new BoundingSphere(position, raio);
         }
 
-        public bool collides()
+        public bool collides(Vector3 _center)
         {
-            Sphere.Center = position;
-            foreach (var item in Game1.TankList)
+            Sphere.Center = _center;
+            foreach (var other in Game1.TankList)
             {
-                if (item != this)
+                if (other != this)
                 {
-                    Vector3 distance = Sphere.Center - item.Sphere.Center;
-                    if (distance.Length() <= 8)
+                    Vector3 distance = Sphere.Center - other.Sphere.Center;
+                    if (distance.Length() <= Sphere.Radius + other.Sphere.Radius)
                     {
                         Debug.WriteLine("I COLIDE " + a);
                         a++;
