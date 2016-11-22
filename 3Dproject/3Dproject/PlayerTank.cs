@@ -37,7 +37,7 @@ namespace _3Dproject
             {
                 TankYaw += 2f;
                 steerYaw += 5f * steerMult;
-                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
+                if ((!keyboardState.IsKeyDown(movementKeys[2])) && (!keyboardState.IsKeyDown(movementKeys[3])))
                 {
                     wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, 5f });
                     steerMult = -1f;
@@ -55,7 +55,7 @@ namespace _3Dproject
             {
                 TankYaw -= 2f;
                 steerYaw -= 5f * steerMult;
-                if (!keyboardState.IsKeyDown(Keys.W) && !keyboardState.IsKeyDown(Keys.S))
+                if (!keyboardState.IsKeyDown(movementKeys[2]) && !keyboardState.IsKeyDown(movementKeys[3]))
                 {
                     wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, 5f, -5f });
                     steerMult = -1f;
@@ -101,7 +101,7 @@ namespace _3Dproject
 
             if (keyboardState.IsKeyDown(movementKeys[4]) && !prevKeyboard.IsKeyDown(movementKeys[4]))
             {
-                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos, BulletTrajectory, ID,0.1f));
+                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID,0.5f));
             }
 
             float minHeight = Game1.terrain.retCameraHeight(position);

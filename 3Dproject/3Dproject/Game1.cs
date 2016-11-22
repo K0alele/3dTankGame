@@ -69,7 +69,7 @@ namespace _3Dproject
                 MouseState mouseState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);                               
 
-                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, TankList[0].returnPosition());
+                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition() });
 
                 foreach (PlayerTank item in TankList)                
                     item.Update();

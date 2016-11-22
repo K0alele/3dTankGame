@@ -104,16 +104,12 @@ namespace _3Dproject
 
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
+                    effect.DiffuseColor = new Vector3(0,0,0);
                 }                
                 mesh.Draw();
             }
 
             basicEffect = new BasicEffect(device);
-
-            for (int i = 0; i < prevPos.Count - 1; i++)
-            {
-                DrawVectors(device, prevPos[i], prevPos[i + 1], Color.OrangeRed);
-            }
         }
 
         public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)

@@ -12,7 +12,7 @@ namespace _3Dproject
 {
     public class Camera
     {
-        private int CameraId = 2, PrevScrollWeelValue = 0;
+        private int CameraId = 0, PrevScrollWeelValue = 0;
         private float[] CameraSpeed = { 0.5f, 0.4f};
         float yaw = 90f, pitch = 0f,aspectRatio, scale = 1f, cameraDistance = 15;
         float HeightOffset = 8f, minHeight = 0;
@@ -34,7 +34,7 @@ namespace _3Dproject
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, 0.3f, 1000.0f);
         }
 
-        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue , Vector3 _TankPosition)
+        public void Update(Vector2 currPos, Vector2 HalfHalf, int scrollValue , Vector3[] _TankPosition)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -55,7 +55,7 @@ namespace _3Dproject
             switch (CameraId)
             {
                 //SurfaceFollow
-                case 0:
+                case 2:
                     if (keyboardState.IsKeyDown(Keys.NumPad8))
                     {
                         pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * CameraSpeed[1];
@@ -94,7 +94,7 @@ namespace _3Dproject
                     break;
 
                 //FreeRoam
-                case 1:
+                case 3:
                     if (keyboardState.IsKeyDown(Keys.NumPad8))
                     {
                         pos.X += (float)Math.Cos(MathHelper.ToRadians(yaw)) * (float)Math.Cos(MathHelper.ToRadians(pitch)) * CameraSpeed[0];
@@ -139,7 +139,7 @@ namespace _3Dproject
                         * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
                     
                     break;
-                case 2:
+                case 0 : case 1:
                     pitch = MathHelper.Clamp(pitch, -40, 40);
                     if (scrollValue > PrevScrollWeelValue && cameraDistance > 8)
                         cameraDistance -= 1f;
@@ -148,7 +148,7 @@ namespace _3Dproject
 
                     PrevScrollWeelValue = scrollValue;
 
-                    Vector3 tankPos = _TankPosition;
+                    Vector3 tankPos = _TankPosition[CameraId];
 
                     pos = Vector3.Transform(new Vector3((tankPos.X - cameraDistance),
                         tankPos.Y + cameraDistance,

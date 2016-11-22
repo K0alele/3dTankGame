@@ -200,7 +200,7 @@ namespace _3Dproject
 
             cannonPos = boneTransforms[tankModel.Meshes["canon_geo"].ParentBone.Index].Translation * scale;
 
-            Debug.WriteLine("HP : " + HP);
+            //Debug.WriteLine("HP : " + HP);
 
             //TEST
             //DrawVectors(device, position, position + cannonPos, Color.Red);         
