@@ -37,37 +37,23 @@ namespace _3Dproject
             {
                 TankYaw += 2f;
                 steerYaw += 5f * steerMult;
-                if ((!keyboardState.IsKeyDown(movementKeys[2])) && (!keyboardState.IsKeyDown(movementKeys[3])))
+                if ((keyboardState.IsKeyUp(movementKeys[2])) && (keyboardState.IsKeyUp(movementKeys[3])))
                 {
                     wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, 5f });
                     steerMult = -1f;
                     steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
-                }
-                else
-                {
-                    if (steerYaw > 30)
-                        steerYaw -= 5f;
-                    if (steerYaw < -30)
-                        steerYaw += 5f;
                 }
             }
             if (keyboardState.IsKeyDown(movementKeys[1]))
             {
                 TankYaw -= 2f;
                 steerYaw -= 5f * steerMult;
-                if (!keyboardState.IsKeyDown(movementKeys[2]) && !keyboardState.IsKeyDown(movementKeys[3]))
+                if ((keyboardState.IsKeyUp(movementKeys[2])) && (keyboardState.IsKeyUp(movementKeys[3])))
                 {
                     wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, 5f, -5f });
                     steerMult = -1f;
                     steerYaw = MathHelper.Clamp(steerYaw, -90, 90);
-                }
-                else
-                {
-                    if (steerYaw > 30)
-                        steerYaw -= 5f;
-                    if (steerYaw < -30)
-                        steerYaw += 5f;
-                }
+                }                
             }
 
             if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
@@ -77,21 +63,29 @@ namespace _3Dproject
                 else if (steerYaw < 0)
                     steerYaw += 5f;
             }
-
+            
             if (keyboardState.IsKeyDown(movementKeys[2]))
             {
                 direction.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 direction.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
-                steerMult = 1f;
-
+                steerMult = 1f;                
             }
             if (keyboardState.IsKeyDown(movementKeys[3]))
             {
                 direction.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 direction.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
-                steerMult = -1f;
+                steerMult = -1f;                
+            }
+
+            if (keyboardState.IsKeyDown(movementKeys[2]) || keyboardState.IsKeyDown(movementKeys[3]))
+            {
+                if (steerYaw > 30)
+                    steerYaw -= 10f;
+                else if (steerYaw < -30)
+                    steerYaw += 10f;
+                else MathHelper.Clamp(steerYaw,-29,29);
             }
 
             if (keyboardState.IsKeyDown(Keys.NumPad2))

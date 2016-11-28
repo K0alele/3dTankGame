@@ -18,7 +18,7 @@ namespace _3Dproject
         float HeightOffset = 8f, minHeight = 0;
         Vector3 cameraTarguet, pos;
 
-        Keys[] cameraKeys = { Keys.F1, Keys.F2 , Keys.F3};        
+        Keys[] cameraKeys = { Keys.F1, Keys.F2 , Keys.F3, Keys.F4};        
 
         public Matrix viewMatrix, projectionMatrix;       
 

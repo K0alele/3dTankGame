@@ -20,7 +20,7 @@ namespace _3Dproject
 
         Matrix[] boneTransforms;
 
-        Vector3 position;
+        Vector3 position, prevPosition;        
         Vector3 direction;
         Vector3 gravity;
 
@@ -28,8 +28,6 @@ namespace _3Dproject
         public bool hit = false;
         private bool saiu = false;
         private int TankId;
-
-        List<Vector3> prevPos = new List<Vector3>();
 
         BoundingSphere c;
         
@@ -57,12 +55,12 @@ namespace _3Dproject
         }
 
         public void Update()
-        {
-            c.Center = position;
+        {            
+            prevPosition = position;
             position += (direction - gravity) * speed;
+            c.Center = position;
             gravity.Y += 0.005f;
-            collides();
-            prevPos.Add(position);
+            collides();          
         }
 
         public void collides()
@@ -78,11 +76,9 @@ namespace _3Dproject
                         item.GotHit();
                         hit = true;
                     }                                         
-                }
-                if (TankId == Game1.TankList.IndexOf(item) && distance.Length() >= raio + item.Sphere.Radius)
-                {
-                    saiu = true;
-                }
+                }                
+                if (!saiu && TankId == Game1.TankList.IndexOf(item) && distance.Length() >= raio + item.Sphere.Radius)                
+                    saiu = true;                
             }
         }
 

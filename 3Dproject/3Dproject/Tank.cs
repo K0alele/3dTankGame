@@ -114,8 +114,6 @@ namespace _3Dproject
             {
                 Sphere = BoundingSphere.CreateMerged(Sphere, new BoundingSphere(new Vector3(item.BoundingSphere.Center.X * scale, item.BoundingSphere.Center.Y * scale, item.BoundingSphere.Center.Z * scale), item.BoundingSphere.Radius * scale));
             }
-
-            //Sphere = new BoundingSphere(position, raio);
         }
 
         public bool collides(Vector3 _center)
@@ -200,13 +198,16 @@ namespace _3Dproject
 
             cannonPos = boneTransforms[tankModel.Meshes["canon_geo"].ParentBone.Index].Translation * scale;
 
+            for (int i = 0; i < wheelNames.Length; i++)
+                DrawVectors(device, position, position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale, Color.White);
+
             //Debug.WriteLine("HP : " + HP);
 
             //TEST
             //DrawVectors(device, position, position + cannonPos, Color.Red);         
             //DrawVectors(device, position, position + tankNormal, Color.Red);
             //DrawVectors(device, position, position + tankRight, Color.Green);
-            //DrawVectors(device, position, position + tankFront, Color.White);
+            //DrawVectors(device, position, position + tankFront, Color.White);            
             //DrawVectors(device, position, position + direction, Color.HotPink);
             //DrawVectors(device, position, position + BulletTrajectory, Color.LightBlue);
             //DrawVectors(device, position, position + new Vector3(raio, 0, 0), Color.HotPink);
