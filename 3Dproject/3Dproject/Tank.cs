@@ -49,24 +49,24 @@ namespace _3Dproject
         protected float limitZ, limitX;
 
         protected Vector3 position;
-        protected Vector3 BulletTrajectory = Vector3.Zero;
-        List<Vector3> BulletPath = new List<Vector3>();        
+        protected Vector3 BulletTrajectory = Vector3.Zero;            
 
         protected static List<Bullet> bulletList;
-        protected Keys[] movementKeys;
-
-        protected KeyboardState prevKeyboard;        
+        protected Keys[] movementKeys;   
 
         public BoundingSphere Sphere;
 
         protected int ID;
         private float raio = MathHelper.Pi + MathHelper.E / 3;
         protected Vector3 cannonPos = Vector3.Zero;
+        protected PSystem particleSystem;
+        protected Vector3[] wheelsPos;
 
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
         {
             scale = 0.01f;
             position = _position;
+            wheelsPos = new Vector3[wheelNames.Length];
             //TEST
             basicEffect = new BasicEffect(device);
             //TEST
@@ -107,13 +107,14 @@ namespace _3Dproject
             boneTransforms = new Matrix[tankModel.Bones.Count];
             wheelsRotation = new float[4];
             worldMatrix = Matrix.Identity;
-            prevKeyboard = Keyboard.GetState();
             bulletList = new List<Bullet>();
 
             foreach (var item in tankModel.Meshes)
             {
                 Sphere = BoundingSphere.CreateMerged(Sphere, new BoundingSphere(new Vector3(item.BoundingSphere.Center.X * scale, item.BoundingSphere.Center.Y * scale, item.BoundingSphere.Center.Z * scale), item.BoundingSphere.Radius * scale));
             }
+
+            particleSystem = new PSystem(device, 2f, 40, 10000, Color.Red);
         }
 
         public bool collides(Vector3 _center)
@@ -150,7 +151,7 @@ namespace _3Dproject
             return result;
         }
 
-        public void Draw(GraphicsDevice device)
+        public void Draw(GraphicsDevice device, GameTime gameTime)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
@@ -192,15 +193,18 @@ namespace _3Dproject
             foreach (var item in bulletList)
                 item.Draw(device);
 
-            BulletTrajectory =  Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
+            BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
                                                 MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal,
                                                 MathHelper.ToRadians(turretYaw)));
 
             cannonPos = boneTransforms[tankModel.Meshes["canon_geo"].ParentBone.Index].Translation * scale;
 
             for (int i = 0; i < wheelNames.Length; i++)
-                DrawVectors(device, position, position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale, Color.White);
+            {
+                wheelsPos[i] = position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale;
+            }
 
+<<<<<<< HEAD
             DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw+TankYaw)),
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Y,
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw+TankYaw))),
@@ -220,6 +224,11 @@ namespace _3Dproject
             
             Debug.WriteLine("Yaw   : " + TankYaw.ToString()+
                           "\nSteer : "+steerYaw.ToString());
+=======
+            particleSystem.Update(gameTime, wheelsPos, new Vector3[] { Vector3.Transform(-tankFront, Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw))), Vector3.Transform(-tankFront, Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw))), -tankFront, - tankFront});
+            particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
+            //Debug.WriteLine("HP : " + HP);
+>>>>>>> origin/master
 
             //TEST
             //DrawVectors(device, position, position + cannonPos, Color.Red);         

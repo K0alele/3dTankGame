@@ -410,6 +410,10 @@ namespace _3Dproject
             effect.CurrentTechnique.Passes[0].Apply();
             device.SetVertexBuffer(vertexBuffer);
             device.Indices = indexBuffer;
+
+            VertexPositionNormalTexture[] vert = new VertexPositionNormalTexture[Width * Height];
+            vertexBuffer.GetData<VertexPositionNormalTexture>(vert);
+
             for (int y = 0; y < Height - 1; y++)
             {
                 device.DrawIndexedPrimitives(PrimitiveType.TriangleStrip, 0, y * 2 * Width, (Width - 1) * 2);

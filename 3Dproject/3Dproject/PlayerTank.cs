@@ -13,12 +13,16 @@ namespace _3Dproject
 {
     public class PlayerTank : Tank
     {
+        private const float delay = 1.5f;
+        private float remainingDelay = delay;
+        private bool canFire = true;
+
         public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys) : base(device, content, _position,_id ,_movementKeys)
         {
 
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             KeyboardState keyboardState = Keyboard.GetState();
 
@@ -93,9 +97,20 @@ namespace _3Dproject
             else if (keyboardState.IsKeyDown(Keys.NumPad3))
                 hatchRotation -= 2f;
 
-            if (keyboardState.IsKeyDown(movementKeys[4]) && !prevKeyboard.IsKeyDown(movementKeys[4]))
+            float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            remainingDelay -= timer;
+
+            if (remainingDelay <= 0)
+            {
+                canFire = true;
+                remainingDelay = delay;
+            }
+
+            if (keyboardState.IsKeyDown(movementKeys[4])  && canFire)
             {
                 bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID,0.5f));
+                canFire = false;
             }
 
             float minHeight = Game1.terrain.retCameraHeight(position);
@@ -114,9 +129,7 @@ namespace _3Dproject
             position.X = MathHelper.Clamp(position.X, Sphere.Radius, limitX - Sphere.Radius);
             position.Z = MathHelper.Clamp(position.Z, Sphere.Radius, limitZ - Sphere.Radius);
 
-            prevKeyboard = keyboardState;
-
-            position.Y = minHeight;
+            position.Y = minHeight;            
         }
 
         public void UpdateBullets()
