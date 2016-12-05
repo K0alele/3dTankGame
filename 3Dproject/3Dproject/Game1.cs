@@ -71,6 +71,7 @@ namespace _3Dproject
 
                 MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition() });
 
+                TankList[0].UpdateBullets();
                 foreach (PlayerTank item in TankList)                
                     item.Update();
 
