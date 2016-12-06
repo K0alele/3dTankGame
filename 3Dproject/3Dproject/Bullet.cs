@@ -24,7 +24,7 @@ namespace _3Dproject
         Vector3 direction;
         Vector3 gravity;
 
-        float yaw, pitch, speed, scale, raio = 0.21f;
+        float speed, scale, raio = 0.21f;
         public bool hit = false;
         private bool saiu = false;
         private int TankId;

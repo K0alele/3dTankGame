@@ -49,10 +49,10 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, wheelYaw, steerMult);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f);
             }
 
-            if (keyboardState.IsKeyDown(movementKeys[1]))
+            else if (keyboardState.IsKeyDown(movementKeys[1]))
             {
                 TankYaw -= 2f;
                 steerYaw -= 5f * steerMult;
@@ -64,44 +64,38 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, wheelYaw, steerMult);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f);
             }
 
-            if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
+            else if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
             {
                 if (steerYaw > 0)
                     steerYaw -= 5f;
                 else if (steerYaw < 0)
                     steerYaw += 5f;
 
+                wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
+
             }
-            
+
             if (keyboardState.IsKeyDown(movementKeys[2]))
             {
                 direction.X += (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 direction.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
-                particleSystem.CreateParticles(wheelsPos, wheelYaw, steerMult);
+                directionClamp();
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1);
             }
-            if (keyboardState.IsKeyDown(movementKeys[3]))
+
+            else if (keyboardState.IsKeyDown(movementKeys[3]))
             {
                 direction.X -= (float)Math.Sin(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 direction.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
-                particleSystem.CreateParticles(wheelsPos, wheelYaw, steerMult);
-            }
-
-            if (keyboardState.IsKeyDown(movementKeys[2]) || keyboardState.IsKeyDown(movementKeys[3]))
-            {
-                if (steerYaw > 30)
-                    steerYaw -= 10f;
-                else if (steerYaw < -30)
-                    steerYaw += 10f;
-                else MathHelper.Clamp(steerYaw,-29,29);
-                wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, wheelYaw, steerMult);
+                directionClamp();
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .75f);
             }
 
             if (keyboardState.IsKeyDown(Keys.NumPad2))
@@ -144,7 +138,7 @@ namespace _3Dproject
             position.Y = minHeight;
 
             //Update Particulas
-            particleSystem.Update();
+            particleSystem.Update(gameTime);
         }
 
         public void UpdateBullets()
@@ -157,6 +151,15 @@ namespace _3Dproject
                     bulletList.Remove(bulletList[i]);
                 else bulletList[i].Update();
             }
+        }
+
+        private void directionClamp()
+        {
+            if (steerYaw > 30)
+                steerYaw -= 10f;
+            else if (steerYaw < -30)
+                steerYaw += 10f;
+            else MathHelper.Clamp(steerYaw, -29, 29);
         }
     }
 }

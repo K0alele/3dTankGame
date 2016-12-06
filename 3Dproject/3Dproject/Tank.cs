@@ -44,7 +44,7 @@ namespace _3Dproject
         string[] wheelNames = { "l_front_wheel_geo", "r_front_wheel_geo", "l_back_wheel_geo", "r_back_wheel_geo" };
         string[] steerNames = { "r_steer_geo", "l_steer_geo" };
 
-        protected float TankYaw = 0f, steerYaw = 0, hatchRotation = 0, TankPitch = 0;
+        protected float TankYaw = 0f, steerYaw = 0, hatchRotation = 0;
         protected float[] wheelsRotation;
         protected float[] wheelYaw;
         protected float limitZ, limitX;
@@ -58,10 +58,10 @@ namespace _3Dproject
         public BoundingSphere Sphere;
 
         protected int ID;
-        private float raio = MathHelper.Pi + MathHelper.E / 3;
         protected Vector3 cannonPos = Vector3.Zero;
         protected PSystem particleSystem;
         protected Vector3[] wheelsPos;
+        protected float RightY;
 
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
         {
@@ -116,7 +116,8 @@ namespace _3Dproject
             }
 
             wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-            particleSystem = new PSystem(device, 2f, 40, 10000, Color.White);
+            RightY = 0;
+            particleSystem = new PSystem(device, 2f, 40, 10000, Color.White/*new Color(188,99,10)*/);
         }
 
         public bool collides(Vector3 _center)
@@ -202,7 +203,7 @@ namespace _3Dproject
 
             cannonPos = boneTransforms[tankModel.Meshes["canon_geo"].ParentBone.Index].Translation * scale;
 
-            //POsição das rodas
+            //Posição das rodas
             for (int i = 0; i < wheelNames.Length; i++)
             {
                 wheelsPos[i] = position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale;
@@ -210,36 +211,42 @@ namespace _3Dproject
 
 
             //Desenhar Particulas
+            RightY = tankRight.Y;
             particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
 
             
             for (int i=0;i<4;i++)
-            DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation,Color.White);
+                DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
+
+
 
             DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw + TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Y,
+                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Y - 1.8f * tankRight.Y,
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw + TankYaw))),
                                                                  Color.Red);
+            DrawVectors(device, position, position + tankRight, Color.Red);
+
             DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.X - 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw + TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.Y,
+                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.Y + 1.8f * tankRight.Y,
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.Z + 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw + TankYaw))),
                                                                  Color.Yellow);
             DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.X - 1.5f * (float)Math.Cos(MathHelper.ToRadians(TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.Y,
+                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.Y + 1.8f * tankRight.Y,
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.Z + 1.5f * (float)Math.Sin(MathHelper.ToRadians(TankYaw))),
                                                                  Color.Blue);
             DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.Y,
+                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.Y - 1.8f * tankRight.Y,
                                                                  scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(TankYaw))),
                                                                  Color.Green);
 
-
+            DrawVectors(device, position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation,
+                                position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation - 1.8f * tankRight, Color.Violet); 
             //Debug.WriteLine("Yaw   : " + TankYaw.ToString() +
             //              "\nSteer : " + steerYaw.ToString());
 
             //TEST
-            //DrawVectors(device, position, position + cannonPos, Color.Red);         
-            //DrawVectors(device, position, position + tankNormal, Color.Red);
+
+
             //DrawVectors(device, position, position + tankRight, Color.Green);
             //DrawVectors(device, position, position + tankFront, Color.White);            
             //DrawVectors(device, position, position + direction, Color.HotPink);
@@ -260,8 +267,8 @@ namespace _3Dproject
             basicEffect.World = worldMatrix;
             basicEffect.VertexColorEnabled = true;
             basicEffect.CurrentTechnique.Passes[0].Apply();
-            //startPoint.Y += 4;
-            //endPoint.Y += 4;
+            //startPoint.Y += 5;
+            //endPoint.Y += 5;
             VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
             device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }

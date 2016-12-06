@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,8 +16,6 @@ namespace _3Dproject
 
         private float raio;
         private int amount, maxAmount;
-        private float StartAmount = 2;
-        private bool isPaused = false;
 
         private Random random = new Random();
         private List<Particle> particles;
@@ -43,26 +40,24 @@ namespace _3Dproject
             worldMatrix = Matrix.Identity;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             //Update das Particulas
             for (int i = 0; i < particles.Count; i++)
             {
-                particles[i].Update();
+                particles[i].Update(gameTime);
                 if (!particles[i].IsAlive())
                     particles.RemoveAt(i);
             }
-            Debug.WriteLine(particles.Count.ToString());
-
         }
 
-        public void CreateParticles(Vector3[] pos, float[] yaw, float mult)
+        public void CreateParticles(Vector3[] pos, float RightY, float[] yaw, float mult, float ratio)
         {
             //Adicionar particulas se a quantidade das mesmas for menor que a quantidade maxima
-            for (int i = 0; i < amount; i++)
+            for (int i = 0; i < (int)(amount * ratio); i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(pos[i % pos.Length], yaw[i % yaw.Length], mult, random));
+                    particles.Add(new Particle(i%pos.Length, pos[i % pos.Length], RightY, yaw[i % yaw.Length], mult, random));
                 else break;
             }
         }
@@ -82,23 +77,11 @@ namespace _3Dproject
                 for (int i = 0; i < particles.Count; i++)
                 {
                     vertices[i * 2] = new VertexPositionColor(particles[i].Position, particleColor);
-                    vertices[i * 2 + 1] = new VertexPositionColor(particles[i].OutroPos, particleColor);
+                    vertices[i * 2 + 1] = new VertexPositionColor(particles[i].Lenght, particleColor);
                 }
-                //Debug.WriteLine(particles.Count.ToString() + "\npos1: " + particles[0].Position.ToString() + "\npos2: " + particles[0].OutroPos.ToString());
 
                 device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, particles.Count);
             }
-        }
-        //Recomeçar a chuva
-        public void ClearRain()
-        {
-            particles.Clear();
-            StartAmount = 2;
-        }
-        //Pausar ou tirar a pausa da chuva
-        public void ChangeState()
-        {
-            isPaused = !isPaused;
         }
     }
 }
