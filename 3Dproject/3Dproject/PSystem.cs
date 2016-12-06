@@ -43,41 +43,51 @@ namespace _3Dproject
             worldMatrix = Matrix.Identity;
         }
 
-        public void Update(GameTime gameTime, Vector3[] direction, Vector3[] positions)
+        public void Update()
         {
             //Update das Particulas
             for (int i = 0; i < particles.Count; i++)
             {
-                particles[i].Update(gameTime);
-                Vector3 pos = particles[i].retPosition();
-                if (pos.Y <= Game1.terrain.retCameraHeight(pos) || !particles[i].IsAlive())
+                particles[i].Update();
+                if (!particles[i].IsAlive())
                     particles.RemoveAt(i);
             }
+            Debug.WriteLine(particles.Count.ToString());
+
+        }
+
+        public void CreateParticles(Vector3[] pos, float[] yaw, float mult)
+        {
             //Adicionar particulas se a quantidade das mesmas for menor que a quantidade maxima
             for (int i = 0; i < amount; i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(raio, positions[i % positions.Count() ], direction[i % positions.Count()], random, 0.4f));
+                    particles.Add(new Particle(pos[i % pos.Length], yaw[i % yaw.Length], mult, random));
                 else break;
             }
         }
 
         public void Draw(GraphicsDevice device, Matrix view, Matrix projection)
         {
-            effect.Projection = projection;
-            effect.View = view;
-            effect.World = worldMatrix;
-
-            effect.CurrentTechnique.Passes[0].Apply();
-
-            VertexPositionColor[] vertices = new VertexPositionColor[particles.Count * 2];
-
-            for (int i = 0; i < particles.Count; i++)
+            if (particles.Count != 0)
             {
-                vertices[i * 2] = new VertexPositionColor(particles[i].retPosition(), particleColor);
-                vertices[i * 2 + 1] = new VertexPositionColor(particles[i].retLastPosition(), particleColor);
+                effect.Projection = projection;
+                effect.View = view;
+                effect.World = worldMatrix;
+
+                effect.CurrentTechnique.Passes[0].Apply();
+
+                VertexPositionColor[] vertices = new VertexPositionColor[particles.Count * 2];
+
+                for (int i = 0; i < particles.Count; i++)
+                {
+                    vertices[i * 2] = new VertexPositionColor(particles[i].Position, particleColor);
+                    vertices[i * 2 + 1] = new VertexPositionColor(particles[i].OutroPos, particleColor);
+                }
+                //Debug.WriteLine(particles.Count.ToString() + "\npos1: " + particles[0].Position.ToString() + "\npos2: " + particles[0].OutroPos.ToString());
+
+                device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, particles.Count);
             }
-            device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, particles.Count / 2);
         }
         //Recomeçar a chuva
         public void ClearRain()

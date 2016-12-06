@@ -69,16 +69,39 @@ namespace _3Dproject
             foreach (var item in Game1.TankList)
             {
                 Vector3 distance = c.Center - item.Sphere.Center;
-                if (distance.Length() <= raio + item.Sphere.Radius)
+
+                if (saiu)
                 {
-                    if (saiu)
+                    if ((prevPosition - position).Length() >= raio + item.Sphere.Radius)
+                    {
+                        Vector3 vpc = position - item.Sphere.Center;
+
+                        float A = (item.Sphere.Center - position).Length();
+                        float B = (item.Sphere.Center - prevPosition).Length();
+                        float C = (prevPosition - position).Length();
+
+                        float sp = (A + B + C) / 2;
+
+                        float area = (float)Math.Sqrt(sp * (sp - A) * (sp - B) *(sp - C));
+
+                        float d = 2 * area / C;
+
+                        if (d <= item.Sphere.Radius && TankId != Game1.TankList.IndexOf(item))
+                        {
+                            item.GotHit();
+                            hit = true;
+                            Debug.WriteLine("HIT " + Game1.TankList.IndexOf(item));
+                        }
+                    }
+                    else if (distance.Length() <= raio + item.Sphere.Radius)
                     {
                         item.GotHit();
                         hit = true;
-                    }                                         
-                }                
-                if (!saiu && TankId == Game1.TankList.IndexOf(item) && distance.Length() >= raio + item.Sphere.Radius)                
-                    saiu = true;                
+                        Debug.WriteLine("HIT " + Game1.TankList.IndexOf(item));
+                    }
+                }
+                else if (!saiu && TankId == Game1.TankList.IndexOf(item) && distance.Length() >= raio + item.Sphere.Radius)
+                    saiu = true;
             }
         }
 
