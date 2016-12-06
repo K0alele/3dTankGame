@@ -62,6 +62,16 @@ namespace _3Dproject
             }
         }
 
+        public void FireParticles(Vector3 pos, Vector3 outroPos, int quant)
+        {
+            for (int i = 0; i < quant; i++)
+            {
+                if (particles.Count < maxAmount)
+                    particles.Add(new Particle(pos,outroPos, random));
+                else break;
+            }
+        }
+
         public void Draw(GraphicsDevice device, Matrix view, Matrix projection)
         {
             if (particles.Count != 0)

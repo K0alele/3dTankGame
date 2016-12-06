@@ -17,7 +17,6 @@ namespace _3Dproject
         private bool state = true;
         private double timer;
 
-        //Aceleração Static para que todas as particulas tenham o mesmo comportamento quanto à gravidade/vento
         private Vector3 accel = new Vector3(0, -.01f, 0);
 
 
@@ -38,6 +37,31 @@ namespace _3Dproject
             direc.X = -mult * (float)Math.Cos(MathHelper.ToRadians(-yaw + angulo + 45));
             direc.Z = -mult * (float)Math.Sin(MathHelper.ToRadians(-yaw + angulo + 45));
             direc.Normalize();
+
+            //Tornar a velocidade mais aleatoria
+            float vel = (float)d.NextDouble() * 1.5f;
+            direc *= vel;
+        }
+
+        public Particle(Vector3 pos, Vector3 outroPos, Random d)
+        {
+            timer = d.NextDouble() * 1.5;
+
+            posicao = outroPos;
+
+            direc =Vector3.Transform(outroPos-pos,Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians((float)(-70 + d.NextDouble() * 140)), 
+                                                                                MathHelper.ToRadians((float)(-70 + d.NextDouble() * 140)), 
+                                                                                0));
+            direc.Normalize();
+            ////Pitch de Saída aleatóro
+            //float angulo = (float)d.NextDouble() * 140;
+            //direc = new Vector3(0, (float)Math.Sin(MathHelper.ToRadians(pitch - 70 + angulo)), 0);
+
+            ////Yaw de saída aleatório
+            //angulo = (float)d.NextDouble() * 140;
+            //direc.X = (float)Math.Cos(MathHelper.ToRadians(-yaw - 70 + angulo + 90));
+            //direc.Z = (float)Math.Sin(MathHelper.ToRadians(-yaw - 70 + angulo + 90));
+            //direc.Normalize();
 
             //Tornar a velocidade mais aleatoria
             float vel = (float)d.NextDouble() * 1.5f;

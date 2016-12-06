@@ -112,10 +112,11 @@ namespace _3Dproject
                 canFire = true;
                 remainingDelay = delay;
             }
-
-            if (keyboardState.IsKeyDown(movementKeys[4])  && canFire)
+            Debug.WriteLine("yaw: " + turretYaw + TankYaw + "\npitch: " + canonPitch);
+            if (keyboardState.IsKeyDown(movementKeys[4]) && canFire)
             {
                 bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID,0.5f));
+                particleSystem.FireParticles(position+cannonPos,position + cannonPos + BulletTrajectory*2,/*turretYaw+TankYaw, canonPitch,*/ 500);
                 canFire = false;
             }
 
