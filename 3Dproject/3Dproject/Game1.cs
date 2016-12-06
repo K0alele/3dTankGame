@@ -14,7 +14,7 @@ namespace _3Dproject
         
         public static Camera MainCamera;
         public static Terrain terrain;
-        public static List<PlayerTank> TankList;
+        public static List<Tank> TankList;
 
         Vector2 half;        
 
@@ -34,7 +34,7 @@ namespace _3Dproject
             half = new Vector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);            
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
-            TankList = new List<PlayerTank>();
+            TankList = new List<Tank>();
             TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
             TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(20, 0, 10), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
 
@@ -72,7 +72,7 @@ namespace _3Dproject
                 MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition() });
 
                 TankList[0].UpdateBullets();
-                foreach (PlayerTank item in TankList)                
+                foreach (var item in TankList)                
                     item.Update(gameTime);
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);
@@ -85,7 +85,7 @@ namespace _3Dproject
             GraphicsDevice.Clear(Color.LightGray);
 
             terrain.Draw(GraphicsDevice);
-            foreach (PlayerTank item in TankList)
+            foreach (var item in TankList)
                 item.Draw(GraphicsDevice, gameTime);
 
             base.Draw(gameTime);

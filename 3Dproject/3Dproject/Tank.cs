@@ -154,6 +154,23 @@ namespace _3Dproject
             return result;
         }
 
+        public virtual void Update(GameTime gameTime)
+        {
+
+        }
+
+        public void UpdateBullets()
+        {
+            float minHeight = Game1.terrain.retCameraHeight(position);
+            for (int i = 0; i < bulletList.Count; i++)
+            {
+                Vector3 pos = bulletList[i].returnPosition();
+                if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ || bulletList[i].hit)
+                    bulletList.Remove(bulletList[i]);
+                else bulletList[i].Update();
+            }
+        }
+
         public void Draw(GraphicsDevice device, GameTime gameTime)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
