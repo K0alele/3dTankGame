@@ -46,15 +46,15 @@ namespace _3Dproject
             color = new Color(c.R + cOff, c.G + cOff , c.B + cOff);
         }
 
-        public Particle(Vector3 pos, Vector3 outroPos, Random d, Color c)
+        public Particle(Vector3 pos, Vector3 direction, Vector3 Up, Vector3 Right, Random d, Color c)
         {
             timer = d.NextDouble() * 1.5;
 
-            posicao = outroPos;
+            posicao = pos;
 
-            direc = Vector3.Transform(outroPos-pos,Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians((float)(d.NextDouble() * 50)), 
-                                                                                MathHelper.ToRadians((float)(d.NextDouble()) * 180), 
-                                                                                0));
+            direc = 2 * Vector3.Transform(direction, Matrix.CreateFromAxisAngle(Right,MathHelper.ToRadians(d.Next(-90,91)))
+                                                 *Matrix.CreateFromAxisAngle(Up,MathHelper.ToRadians(d.Next(-90, 91))));
+                                                                                
             direc *= 0.2f;
             ////Pitch de Saída aleatóro
             //float angulo = (float)d.NextDouble() * 140;

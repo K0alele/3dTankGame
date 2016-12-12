@@ -29,7 +29,7 @@ namespace _3Dproject
         private bool saiu = false;
         private int TankId;
 
-        BoundingSphere c;
+        public BoundingSphere Sphere;
         
         public Bullet(BasicEffect _effect, Model _model, Vector3 _position , Vector3 _direction,int _TankId, float _speed)
         {                        
@@ -46,7 +46,7 @@ namespace _3Dproject
 
             gravity = Vector3.Zero;
 
-            c = new BoundingSphere(_position, raio);       
+            Sphere = new BoundingSphere(_position, raio);       
         }
 
         public Vector3 returnPosition()
@@ -58,17 +58,17 @@ namespace _3Dproject
         {            
             prevPosition = position;
             position += (direction - gravity) * speed;
-            c.Center = position;
+            Sphere.Center = position;
             gravity.Y += 0.005f;
             collides();          
         }
 
         public void collides()
         {
-            c.Center = position;
+            Sphere.Center = position;
             foreach (var item in Game1.TankList)
             {
-                Vector3 distance = c.Center - item.Sphere.Center;
+                Vector3 distance = Sphere.Center - item.Sphere.Center;
 
                 if (saiu)
                 {
@@ -129,18 +129,6 @@ namespace _3Dproject
             }
 
             basicEffect = new BasicEffect(device);
-        }
-
-        public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
-        {
-            basicEffect.Projection = Game1.MainCamera.projectionMatrix;
-            basicEffect.View = Game1.MainCamera.viewMatrix;
-            basicEffect.World = worldMatrix;
-            basicEffect.VertexColorEnabled = true;
-            basicEffect.CurrentTechnique.Passes[0].Apply();
-
-            VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
-            device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }
     }
 }

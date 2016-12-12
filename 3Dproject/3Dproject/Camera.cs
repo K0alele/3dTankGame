@@ -18,7 +18,7 @@ namespace _3Dproject
         float HeightOffset = 8f, minHeight = 0;
         Vector3 cameraTarguet, pos;
 
-        Keys[] cameraKeys = { Keys.F1, Keys.F2 , Keys.F3, Keys.F4};        
+        Keys[] cameraKeys = { Keys.F1, Keys.F2 , Keys.F3, Keys.F4, Keys.F5};        
 
         public Matrix viewMatrix, projectionMatrix;       
 
@@ -50,7 +50,7 @@ namespace _3Dproject
             
             yaw += (currPos.X - HalfHalf.X) * scale / 20;
             pitch -= (currPos.Y - HalfHalf.Y) * scale / 20;
-            pitch = MathHelper.Clamp(pitch, -90, 90);            
+            pitch = MathHelper.Clamp(pitch, -90, 90);
 
             switch (CameraId)
             {
@@ -127,7 +127,7 @@ namespace _3Dproject
                     if (keyboardState.IsKeyDown(Keys.NumPad7))
                         pos.Y += 1f;
 
-                   
+
                     minHeight = Game1.terrain.retCameraHeight(pos);
 
                     pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
@@ -137,14 +137,51 @@ namespace _3Dproject
                     viewMatrix = Matrix.CreateLookAt(pos, pos + cameraTarguet, Vector3.Up)
                         * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
                         * Matrix.CreateRotationX(MathHelper.ToRadians(pitch));
-                    
+
+                    break;
+                case 4:
+                    BoundingFrustum frustum = new BoundingFrustum(viewMatrix * projectionMatrix);
+
+                    int count = Game1.TankList.Count - 1;
+                    Vector3 medias = Vector3.Zero;
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        medias += new Vector3((Game1.TankList[i].returnPosition().X + Game1.TankList[i + 1].returnPosition().X) / 2, 0,
+                            (Game1.TankList[i].returnPosition().Z + Game1.TankList[i + 1].returnPosition().Z) / 2);
+                    }
+                    medias /= count;
+
+                    pos.X = medias.X;
+                    pos.Z = medias.Z;
+
+                    int visible = Game1.visible.Count;
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad1) && visible == Game1.TankList.Count)
+                        pos.Y -= 1f;
+
+                    if (keyboardState.IsKeyDown(Keys.NumPad7) 
+                        || visible < Game1.TankList.Count)
+                        pos.Y += 1f;                    
+
+                    //Cálculo da altura mínima
+                    minHeight = 20 + Game1.terrain.retCameraHeight(pos);
+
+                    pos.Y = MathHelper.Clamp(pos.Y, minHeight + HeightOffset, 150);
+
+                    pos.X = MathHelper.Clamp(pos.X, 0, (Game1.terrain.Width - 2));
+                    pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
+
+                    viewMatrix = Matrix.CreateLookAt(pos, pos + cameraTarguet, Vector3.Up)
+                        * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                        * Matrix.CreateRotationX(MathHelper.ToRadians(90));
                     break;
                 case 0 : case 1:
                     pitch = MathHelper.Clamp(pitch, -40, 40);
                     if (scrollValue > PrevScrollWeelValue && cameraDistance > 8)
-                        cameraDistance -= 1f;
+                        cameraDistance -= 3f;
                     if (scrollValue < PrevScrollWeelValue && cameraDistance < 60)
-                        cameraDistance += 1f;
+                        cameraDistance += 3f;
 
                     PrevScrollWeelValue = scrollValue;
 

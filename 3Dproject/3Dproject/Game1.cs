@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace _3Dproject
 {
@@ -15,7 +16,10 @@ namespace _3Dproject
         public static Camera MainCamera;
         public static Terrain terrain;
         public static List<Tank> TankList;
+        public static List<Tank> visible;
 
+        BoundingFrustum frustum;
+        
         Vector2 half;        
 
         private bool canPress = true;
@@ -36,7 +40,10 @@ namespace _3Dproject
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<Tank>();
             TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
-            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
+            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));
+            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(10, 0, 400), 1, null));
+
+            visible = new List<Tank>();
 
             this.IsMouseVisible = false;
             base.Initialize();
@@ -56,6 +63,9 @@ namespace _3Dproject
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            frustum = new BoundingFrustum(MainCamera.viewMatrix * MainCamera.projectionMatrix);
+            visible = TankList.Where(m => frustum.Contains(m.Sphere) != ContainmentType.Disjoint).ToList();
 
             if (Keyboard.GetState().IsKeyDown(Keys.P) && canPress)
             {
@@ -82,10 +92,13 @@ namespace _3Dproject
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.LightGray);
+            GraphicsDevice.Clear(Color.LightGray);          
 
             terrain.Draw(GraphicsDevice);
-            foreach (var item in TankList)
+
+            TankList[0].DrawBullets(GraphicsDevice, frustum);
+
+            foreach (var item in visible)
                 item.Draw(GraphicsDevice, gameTime);
 
             base.Draw(gameTime);

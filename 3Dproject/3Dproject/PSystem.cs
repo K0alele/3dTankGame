@@ -62,12 +62,12 @@ namespace _3Dproject
             }
         }
 
-        public void FireParticles(Vector3 pos, Vector3 outroPos, int quant, Color color)
+        public void FireParticles(Vector3 pos, Vector3 dir, Vector3 Up , Vector3 Right, int quant, Color color)
         {
             for (int i = 0; i < quant; i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(pos,outroPos, random, color));
+                    particles.Add(new Particle(pos, dir,Up, Right, random, color));
                 else break;
             }
         }

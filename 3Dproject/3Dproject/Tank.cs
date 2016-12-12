@@ -56,7 +56,7 @@ namespace _3Dproject
         protected Keys[] movementKeys;   
 
         public BoundingSphere Sphere;
-        public Vector3 tankF = Vector3.Zero;
+        public Vector3 tankF = Vector3.Zero, TankR = Vector3.Zero;
 
         protected int ID;
         protected Vector3 cannonPos = Vector3.Zero;
@@ -171,17 +171,29 @@ namespace _3Dproject
             {
                 Vector3 pos = bulletList[i].returnPosition();
                 if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ || bulletList[i].hit)
+                {
+                    Vector3 bullPos = bulletList[i].returnPosition();
+                    particleSystem.FireParticles(bullPos,Game1.terrain.retTerrainNormal(bullPos), Game1.terrain.retTerrainNormal(bullPos),Vector3.Right, 500, Color.Yellow);
                     bulletList.Remove(bulletList[i]);
+                }
                 else bulletList[i].Update();
             }
         }
 
-        public void Draw(GraphicsDevice device, GameTime gameTime)
+        public void DrawBullets(GraphicsDevice device, BoundingFrustum frustum)
+        {
+            List<Bullet> visibleBullets = bulletList.Where(m => frustum.Contains(m.Sphere) != ContainmentType.Disjoint).ToList();
+            foreach (var item in visibleBullets)
+                item.Draw(device);
+        }
+
+        public virtual void Draw(GraphicsDevice device, GameTime gameTime)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
+            TankR = tankRight;
             Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
             tankF = tankFront;
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
@@ -215,10 +227,6 @@ namespace _3Dproject
                 mesh.Draw();
             }
 
-            //Draw Bullets
-            foreach (var item in bulletList)
-                item.Draw(device);
-
             BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
                                                 MathHelper.ToRadians(canonPitch)) * Matrix.CreateFromAxisAngle(tankNormal,
                                                 MathHelper.ToRadians(turretYaw)));
@@ -231,12 +239,19 @@ namespace _3Dproject
                 wheelsPos[i] = position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale;
             }
 
+            //for (int x = 0; x < limitX; x++)
+            //{
+            //    for (int y = 0; y < limitZ; y++)
+            //    {
+            //        Vector3 a = new Vector3(x, Game1.terrain.retCameraHeight(new Vector3(x, 0, y)), y);
+            //        DrawVectors(device,a, a + Game1.terrain.retTerrainNormal(new Vector3(x, 0, y)), Color.White);
+            //    }
+            //}
 
             //Desenhar Particulas
             RightY = tankRight.Y;
             particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
 
-            
             //for (int i=0;i<4;i++)
             //    DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
 
@@ -266,7 +281,7 @@ namespace _3Dproject
             //                    position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation - 1.8f * tankRight, Color.Violet); 
 
 
-            DrawVectors(device, position + cannonPos, position + cannonPos + BulletTrajectory, Color.Green);
+            //DrawVectors(device, position + cannonPos, position + cannonPos + BulletTrajectory, Color.Green);
             //DrawVectors(device, position, position + tankFront, Color.White);            
             //DrawVectors(device, position, position + direction, Color.HotPink);
             //DrawVectors(device, position, position + BulletTrajectory, Color.LightBlue);

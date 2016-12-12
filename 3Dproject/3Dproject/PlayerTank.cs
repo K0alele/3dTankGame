@@ -112,7 +112,7 @@ namespace _3Dproject
             if (keyboardState.IsKeyDown(movementKeys[4]) && canFire)
             {
                 bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID, 1f));
-                particleSystem.FireParticles(position+cannonPos,position + cannonPos + BulletTrajectory*2,/*turretYaw+TankYaw, canonPitch,*/ 500, Color.Yellow);
+                particleSystem.FireParticles(position + cannonPos + BulletTrajectory*2, BulletTrajectory, Game1.terrain.retTerrainNormal(position), TankR, 500, Color.Yellow);
                 canFire = false;
                 remainingDelay = delay;
             }

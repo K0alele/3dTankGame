@@ -59,7 +59,7 @@ namespace _3Dproject
                 steerYaw -= 1f * mult;
             }
 
-            if (distance.Length() >= 20)
+            if (distance.Length() >= 20 && !col)
             {
                 position += direction;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
