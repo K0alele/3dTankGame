@@ -56,6 +56,7 @@ namespace _3Dproject
         protected Keys[] movementKeys;   
 
         public BoundingSphere Sphere;
+        public Vector3 tankF = Vector3.Zero;
 
         protected int ID;
         protected Vector3 cannonPos = Vector3.Zero;
@@ -143,7 +144,11 @@ namespace _3Dproject
         public Vector3 returnPosition()
         {
             return position;
-        }        
+        }
+        public float returnYaw()
+        {
+            return TankYaw;
+        }
 
         public float[] addArrays(float[] a1, float[] a2)
         {
@@ -178,7 +183,7 @@ namespace _3Dproject
             Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
             Vector3 tankRight = Vector3.Cross(direction, tankNormal);
             Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
-
+            tankF = tankFront;
             Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
@@ -207,7 +212,7 @@ namespace _3Dproject
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }
-                //mesh.Draw();
+                mesh.Draw();
             }
 
             //Draw Bullets
@@ -232,8 +237,8 @@ namespace _3Dproject
             particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
 
             
-            for (int i=0;i<4;i++)
-                DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
+            //for (int i=0;i<4;i++)
+            //    DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
 
 
             //TEST

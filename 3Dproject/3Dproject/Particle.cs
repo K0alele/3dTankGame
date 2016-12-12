@@ -16,12 +16,13 @@ namespace _3Dproject
         private Vector3 posicao, direc;
         private bool state = true;
         private double timer;
+        private Color color;
 
         private Vector3 accel = new Vector3(0, -.01f, 0);
 
 
         //Criar particula
-        public Particle(int id, Vector3 pos, float RightY, float yaw, float mult, Random d)
+        public Particle(int id, Vector3 pos, float RightY, float yaw, float mult, Random d, Color c)
         {
             timer= d.NextDouble() * 1.5;
 
@@ -41,18 +42,20 @@ namespace _3Dproject
             //Tornar a velocidade mais aleatoria
             float vel = (float)d.NextDouble() * 1.5f;
             direc *= vel;
+            int cOff = d.Next(-100, 50);
+            color = new Color(c.R + cOff, c.G + cOff , c.B + cOff);
         }
 
-        public Particle(Vector3 pos, Vector3 outroPos, Random d)
+        public Particle(Vector3 pos, Vector3 outroPos, Random d, Color c)
         {
             timer = d.NextDouble() * 1.5;
 
             posicao = outroPos;
 
-            direc =Vector3.Transform(outroPos-pos,Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians((float)(-70 + d.NextDouble() * 140)), 
-                                                                                MathHelper.ToRadians((float)(-70 + d.NextDouble() * 140)), 
+            direc = Vector3.Transform(outroPos-pos,Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians((float)(d.NextDouble() * 50)), 
+                                                                                MathHelper.ToRadians((float)(d.NextDouble()) * 180), 
                                                                                 0));
-            direc.Normalize();
+            direc *= 0.2f;
             ////Pitch de Saída aleatóro
             //float angulo = (float)d.NextDouble() * 140;
             //direc = new Vector3(0, (float)Math.Sin(MathHelper.ToRadians(pitch - 70 + angulo)), 0);
@@ -66,6 +69,7 @@ namespace _3Dproject
             //Tornar a velocidade mais aleatoria
             float vel = (float)d.NextDouble() * 1.5f;
             direc *= vel;
+            color = c;
         }
 
         public void Update(GameTime gametime)
@@ -97,6 +101,11 @@ namespace _3Dproject
         public Vector3 Lenght
         {
             get { return posicao - direc / 10; }
+        }
+
+        public Color Color
+        {
+            get { return color; }
         }
 
         public bool IsAlive()

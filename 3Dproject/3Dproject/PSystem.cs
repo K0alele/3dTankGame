@@ -51,23 +51,23 @@ namespace _3Dproject
             }
         }
 
-        public void CreateParticles(Vector3[] pos, float RightY, float[] yaw, float mult, float ratio)
+        public void CreateParticles(Vector3[] pos, float RightY, float[] yaw, float mult, float ratio, Color color)
         {
             //Adicionar particulas se a quantidade das mesmas for menor que a quantidade maxima
             for (int i = 0; i < (int)(amount * ratio); i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(i%pos.Length, pos[i % pos.Length], RightY, yaw[i % yaw.Length], mult, random));
+                    particles.Add(new Particle(i%pos.Length, pos[i % pos.Length], RightY, yaw[i % yaw.Length], mult, random, color));
                 else break;
             }
         }
 
-        public void FireParticles(Vector3 pos, Vector3 outroPos, int quant)
+        public void FireParticles(Vector3 pos, Vector3 outroPos, int quant, Color color)
         {
             for (int i = 0; i < quant; i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(pos,outroPos, random));
+                    particles.Add(new Particle(pos,outroPos, random, color));
                 else break;
             }
         }
@@ -86,8 +86,9 @@ namespace _3Dproject
 
                 for (int i = 0; i < particles.Count; i++)
                 {
-                    vertices[i * 2] = new VertexPositionColor(particles[i].Position, particleColor);
-                    vertices[i * 2 + 1] = new VertexPositionColor(particles[i].Lenght, particleColor);
+                    Color partColor = particles[i].Color;
+                    vertices[i * 2] = new VertexPositionColor(particles[i].Position, partColor);
+                    vertices[i * 2 + 1] = new VertexPositionColor(particles[i].Lenght, partColor);
                 }
 
                 device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, particles.Count);

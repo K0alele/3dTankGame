@@ -36,7 +36,7 @@ namespace _3Dproject
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<Tank>();
             TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
-            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(20, 0, 10), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
+            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));            
 
             this.IsMouseVisible = false;
             base.Initialize();

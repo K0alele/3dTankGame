@@ -49,7 +49,7 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f, new Color(128, 57, 9));
             }
 
             else if (keyboardState.IsKeyDown(movementKeys[1]))
@@ -64,7 +64,7 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f, new Color(128, 57, 9));
             }
 
             else if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
@@ -75,7 +75,6 @@ namespace _3Dproject
                     steerYaw += 5f;
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-
             }
 
             if (keyboardState.IsKeyDown(movementKeys[2]))
@@ -85,7 +84,7 @@ namespace _3Dproject
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
                 directionClamp();
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1, new Color(128, 57, 9));
             }
 
             else if (keyboardState.IsKeyDown(movementKeys[3]))
@@ -95,7 +94,7 @@ namespace _3Dproject
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
                 directionClamp();
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .75f);
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .75f, new Color(128, 57, 9));
             }
 
             if (keyboardState.IsKeyDown(Keys.NumPad2))
@@ -107,22 +106,18 @@ namespace _3Dproject
 
             remainingDelay -= timer;
 
-            if (remainingDelay <= 0)
-            {
-                canFire = true;
-                remainingDelay = delay;
-            }
-            Debug.WriteLine("yaw: " + turretYaw + TankYaw + "\npitch: " + canonPitch);
+            if (remainingDelay <= 0)            
+                canFire = true;                            
+
             if (keyboardState.IsKeyDown(movementKeys[4]) && canFire)
             {
-                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID,0.5f));
-                particleSystem.FireParticles(position+cannonPos,position + cannonPos + BulletTrajectory*2,/*turretYaw+TankYaw, canonPitch,*/ 500);
+                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID, 1f));
+                particleSystem.FireParticles(position+cannonPos,position + cannonPos + BulletTrajectory*2,/*turretYaw+TankYaw, canonPitch,*/ 500, Color.Yellow);
                 canFire = false;
+                remainingDelay = delay;
             }
 
             float minHeight = Game1.terrain.retCameraHeight(position);
-
-
 
             bool col = collides(position + direction);
 
