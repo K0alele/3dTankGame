@@ -13,7 +13,7 @@ namespace _3Dproject
 {
     public class BotTank : Tank
     {
-        private const float delay = 1.5f;
+        private const float delay = 2.5f;
         private float remainingDelay = delay;
         private bool canFire = false;
         private float speed , prevYaw = 0f;        
@@ -37,6 +37,13 @@ namespace _3Dproject
             Vector3 distance = (otherTank - position);
             Vector3 direction = distance;
             direction.Normalize();
+
+            //Calcular o pitch do canhão dependendo da direçao e do pitch do tank
+            float directionAngle = Math.Abs(direction.Y) / direction.Y * MathHelper.ToDegrees((float)Math.Acos((double)(new Vector3(direction.X,0,direction.Z).Length()/direction.Length())));
+            float frontAngle = Math.Abs(tankF.Y)/tankF.Y * MathHelper.ToDegrees((float)Math.Acos((double)(new Vector3(tankF.X, 0, tankF.Z).Length() / tankF.Length())));
+
+            canonPitch = directionAngle-frontAngle;
+
             direction *= speed;
 
             float tankYaw = Game1.TankList[0].returnYaw();
