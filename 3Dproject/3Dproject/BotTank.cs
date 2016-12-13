@@ -15,7 +15,7 @@ namespace _3Dproject
     {
         private const float delay = 1.5f;
         private float remainingDelay = delay;
-        private bool canFire = true;
+        private bool canFire = false;
         private float speed , prevYaw = 0f;        
 
         public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys) : base(device, content, _position, _id, _movementKeys)
@@ -24,7 +24,14 @@ namespace _3Dproject
         }
 
         public override void Update(GameTime gameTime)
-        {                    
+        {
+            float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            remainingDelay -= timer;
+
+            if (remainingDelay <= 0)
+                canFire = true;
+
             Vector3 otherTank = Game1.TankList[0].returnPosition();
 
             Vector3 distance = (otherTank - position);
@@ -52,11 +59,11 @@ namespace _3Dproject
 
             if (prevYaw < TankYaw)
             {
-                steerYaw += 1f * mult;
+                steerYaw += mult;
             }
             else if (prevYaw > TankYaw)
             {
-                steerYaw -= 1f * mult;
+                steerYaw -=  mult;
             }
 
             if (distance.Length() >= 20 && !col)
@@ -66,6 +73,12 @@ namespace _3Dproject
                 steerMult = 1f;               
                 particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1, new Color(128, 57, 9));
             }
+            else if (canFire && distance.Length() < 20)
+            {                
+                bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID, 1f));
+                canFire = false;
+                remainingDelay = delay;
+            }            
 
             wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
 

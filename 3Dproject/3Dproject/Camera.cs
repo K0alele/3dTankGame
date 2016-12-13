@@ -157,7 +157,8 @@ namespace _3Dproject
 
                     int visible = Game1.visible.Count;
 
-                    if (keyboardState.IsKeyDown(Keys.NumPad1) && visible == Game1.TankList.Count)
+                    if (keyboardState.IsKeyDown(Keys.NumPad1) && 
+                        visible >= Game1.TankList.Count)
                         pos.Y -= 1f;
 
                     if (keyboardState.IsKeyDown(Keys.NumPad7) 
@@ -173,7 +174,7 @@ namespace _3Dproject
                     pos.Z = MathHelper.Clamp(pos.Z, 0, (Game1.terrain.Height - 2));
 
                     viewMatrix = Matrix.CreateLookAt(pos, pos + cameraTarguet, Vector3.Up)
-                        * Matrix.CreateRotationY(MathHelper.ToRadians(yaw))
+                        * Matrix.CreateRotationY(MathHelper.ToRadians(90))
                         * Matrix.CreateRotationX(MathHelper.ToRadians(90));
                     break;
                 case 0 : case 1:

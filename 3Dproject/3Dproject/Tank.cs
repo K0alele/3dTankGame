@@ -165,11 +165,11 @@ namespace _3Dproject
         }
 
         public void UpdateBullets()
-        {
-            float minHeight = Game1.terrain.retCameraHeight(position);
+        {            
             for (int i = 0; i < bulletList.Count; i++)
             {
                 Vector3 pos = bulletList[i].returnPosition();
+                float minHeight = Game1.terrain.retCameraHeight(pos);
                 if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ || bulletList[i].hit)
                 {
                     Vector3 bullPos = bulletList[i].returnPosition();
@@ -187,7 +187,7 @@ namespace _3Dproject
                 item.Draw(device);
         }
 
-        public virtual void Draw(GraphicsDevice device, GameTime gameTime)
+        public void Draw(GraphicsDevice device, GameTime gameTime)
         {
             Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 

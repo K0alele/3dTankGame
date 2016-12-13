@@ -42,7 +42,7 @@ namespace _3Dproject
             effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
             worldMatrix = Matrix.Identity;
 
-            //FOG YAY
+            ////FOG YAY
             //effect.FogEnabled = true;
             //effect.FogColor = Color.LightGray.ToVector3();            
             //effect.FogStart = 5f;

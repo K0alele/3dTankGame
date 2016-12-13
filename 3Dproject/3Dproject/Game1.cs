@@ -41,7 +41,7 @@ namespace _3Dproject
             TankList = new List<Tank>();
             TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
             TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));
-            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(10, 0, 400), 1, null));
+            //TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(10, 0, 400), 1, null));
 
             visible = new List<Tank>();
 

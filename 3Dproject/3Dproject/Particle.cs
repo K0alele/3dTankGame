@@ -14,7 +14,7 @@ namespace _3Dproject
     class Particle
     {
         private Vector3 posicao, direc;
-        private bool state = true;
+        private bool state = true, checkHeight;
         private double timer;
         private Color color;
 
@@ -24,6 +24,7 @@ namespace _3Dproject
         //Criar particula
         public Particle(int id, Vector3 pos, float RightY, float yaw, float mult, Random d, Color c)
         {
+            checkHeight = true;
             timer= d.NextDouble() * 1.5;
 
             //Posição de saída aleatória (dentro dos limites)
@@ -48,12 +49,13 @@ namespace _3Dproject
 
         public Particle(Vector3 pos, Vector3 direction, Vector3 Up, Vector3 Right, Random d, Color c)
         {
+            checkHeight = false;
             timer = d.NextDouble() * 1.5;
 
             posicao = pos;
 
-            direc = 2 * Vector3.Transform(direction, Matrix.CreateFromAxisAngle(Right,MathHelper.ToRadians(d.Next(-90,91)))
-                                                 *Matrix.CreateFromAxisAngle(Up,MathHelper.ToRadians(d.Next(-90, 91))));
+            direc = 2 * Vector3.Transform(direction, Matrix.CreateFromAxisAngle(Right,MathHelper.ToRadians((float)d.NextDouble()*-90f + (float)d.NextDouble() * 90f))
+                                                 *Matrix.CreateFromAxisAngle(Up,MathHelper.ToRadians((float)d.NextDouble() * -90f + (float)d.NextDouble() * 90f)));
                                                                                 
             direc *= 0.2f;
             ////Pitch de Saída aleatóro
@@ -81,7 +83,7 @@ namespace _3Dproject
             //UpdateState
             if (Position.X <= 2 || Position.X >= Game1.terrain.Width - 2 ||
                 Position.Z <= 2 || Position.Z >= Game1.terrain.Height - 2 ||
-                Position.Y <= Game1.terrain.retCameraHeight(Position) ||
+                (checkHeight && Position.Y <= Game1.terrain.retCameraHeight(Position)) ||       
                 timer <= 0)
                 state = false;
         }

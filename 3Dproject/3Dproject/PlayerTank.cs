@@ -49,7 +49,7 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f, new Color(128, 57, 9));
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .2f, new Color(128, 57, 9));
             }
 
             else if (keyboardState.IsKeyDown(movementKeys[1]))
@@ -64,7 +64,7 @@ namespace _3Dproject
                 }
 
                 wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
-                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .5f, new Color(128, 57, 9));
+                particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .2f, new Color(128, 57, 9));
             }
 
             else if (!keyboardState.IsKeyDown(movementKeys[0]) && !keyboardState.IsKeyDown(movementKeys[1]))
