@@ -17,7 +17,7 @@ namespace _3Dproject
         private float remainingDelay = delay;
         private bool canFire = true;
 
-        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys) : base(device, content, _position,_id ,_movementKeys)
+        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys, bool _isBot) : base(device, content, _position,_id ,_movementKeys, _isBot)
         {
 
         }
@@ -112,7 +112,7 @@ namespace _3Dproject
             if (keyboardState.IsKeyDown(movementKeys[4]) && canFire)
             {
                 bulletList.Add(new Bullet(effect, Bullet, position + cannonPos + BulletTrajectory, BulletTrajectory, ID, 1f));
-                particleSystem.FireParticles(position + cannonPos + BulletTrajectory*2, BulletTrajectory, Game1.terrain.retTerrainNormal(position), TankR, 500, Color.Yellow);
+                particleSystem.FireParticles(position + cannonPos + BulletTrajectory*2, BulletTrajectory, tankNormal, tankRight, 500, Color.Yellow);
                 canFire = false;
                 remainingDelay = delay;
             }
@@ -126,15 +126,12 @@ namespace _3Dproject
 
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
-            canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
+            canonPitch = MathHelper.Clamp(canonPitch, -40, 90);
 
             position.X = MathHelper.Clamp(position.X, Sphere.Radius, limitX - Sphere.Radius);
             position.Z = MathHelper.Clamp(position.Z, Sphere.Radius, limitZ - Sphere.Radius);
 
             position.Y = minHeight;
-
-            //Update Particulas
-            particleSystem.Update(gameTime);
         }        
 
         private void directionClamp()

@@ -53,6 +53,10 @@ namespace _3Dproject
         {
             return position;
         }
+        public Vector3 returnDirection()
+        {
+            return direction;
+        }
 
         public void Update()
         {            

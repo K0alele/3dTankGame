@@ -28,7 +28,7 @@ namespace _3Dproject
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
+            Content.RootDirectory = "Content";            
         }
 
         protected override void Initialize()
@@ -39,8 +39,8 @@ namespace _3Dproject
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<Tank>();
-            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0,new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
-            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1,new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));
+            TankList.Add(CreateTanks(false));
+            TankList.Add(CreateTanks(true)); 
             //TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(10, 0, 400), 1, null));
 
             visible = new List<Tank>();
@@ -57,6 +57,14 @@ namespace _3Dproject
         protected override void UnloadContent()
         {
 
+        }
+
+        private Tank CreateTanks(bool bot)
+        {
+            if (bot)
+                return new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1, new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }, bot);
+            else
+                return new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0, new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }, bot);                                    
         }
 
         protected override void Update(GameTime gameTime)
@@ -79,11 +87,26 @@ namespace _3Dproject
                 MouseState mouseState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);                               
 
-                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition() });
+                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition()});
 
                 TankList[0].UpdateBullets();
-                foreach (var item in TankList)                
-                    item.Update(gameTime);
+
+                for (int i = 0; i < TankList.Count; i++)
+                {
+                    TankList[i].UpdateParticles(gameTime);
+                    if (TankList[i].isAlive())
+                    {
+                        TankList[i].Update(gameTime);
+                    }
+                    else
+                    {
+                        if (TankList[i].Respawn())
+                        {
+                            bool isBot = TankList[i].IsBot();
+                            TankList[i] = CreateTanks(isBot); 
+                        }
+                    }                   
+                }         
 
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);
@@ -101,7 +124,7 @@ namespace _3Dproject
             foreach (var item in visible)
                 item.Draw(GraphicsDevice, gameTime);
 
-            base.Draw(gameTime);
+            base.Draw(gameTime);              
         }
     }
 }

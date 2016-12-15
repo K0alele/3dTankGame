@@ -56,19 +56,36 @@ namespace _3Dproject
         protected Keys[] movementKeys;   
 
         public BoundingSphere Sphere;
-        public Vector3 tankF = Vector3.Zero, TankR = Vector3.Zero;
 
         protected int ID;
         protected Vector3 cannonPos = Vector3.Zero;
         protected PSystem particleSystem;
         protected Vector3[] wheelsPos;
         protected float RightY;
+        protected Vector3 direction = Vector3.Zero;
+        protected Vector3 tankNormal = Vector3.Zero;
+        protected Vector3 tankRight = Vector3.Zero;
+        protected Vector3 tankFront = Vector3.Zero;
+        protected Matrix inclinationMatrix;
 
-        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
+        Random rand;
+        Vector3[] WheelsDir;
+        Vector3 TanKMid;
+        private bool exploded = false;
+        private bool respawn = false;
+        private bool isBot;
+
+        private const float delay = 3f;
+        private float remainingDelay = delay;
+
+        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys, bool _isBot)
         {
+            rand = new Random();
+            isBot = _isBot;
             scale = 0.01f;
             position = _position;
             wheelsPos = new Vector3[wheelNames.Length];
+            WheelsDir = new Vector3[wheelNames.Length];
             //TEST
             basicEffect = new BasicEffect(device);
             //TEST
@@ -138,7 +155,19 @@ namespace _3Dproject
 
         public void GotHit()
         {
-            HP -= 10;
+            HP -= 40;
+
+            if (HP <= 0)
+            {
+                exploded = true;
+                TanKMid = Vector3.Up / 2;
+                for (int i = 0; i < wheelNames.Length; i++)
+                {
+                    WheelsDir[i] = wheelsPos[i] - position;
+                    WheelsDir[i] = Vector3.Transform(WheelsDir[i], Matrix.CreateFromAxisAngle(tankNormal, (float)-rand.NextDouble() * 20 + (float)rand.NextDouble() * 20));
+                }
+                particleSystem.FireParticles(position, tankNormal, tankNormal * 2, tankRight, 1000, Color.Yellow);
+            }
         }
 
         public Vector3 returnPosition()
@@ -148,6 +177,18 @@ namespace _3Dproject
         public float returnYaw()
         {
             return TankYaw;
+        }
+        public bool isAlive()
+        {
+            return !exploded;
+        }
+        public bool Respawn()
+        {
+            return respawn;
+        }
+        public bool IsBot()
+        {
+            return isBot;
         }
 
         public float[] addArrays(float[] a1, float[] a2)
@@ -173,11 +214,17 @@ namespace _3Dproject
                 if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ || bulletList[i].hit)
                 {
                     Vector3 bullPos = bulletList[i].returnPosition();
-                    particleSystem.FireParticles(bullPos,Game1.terrain.retTerrainNormal(bullPos), Game1.terrain.retTerrainNormal(bullPos),Vector3.Right, 500, Color.Yellow);
+                    Vector3 terrNorm = Game1.terrain.retTerrainNormal(bullPos);
+                    particleSystem.FireParticles(bullPos, terrNorm , terrNorm ,Vector3.Right, 500, Color.Yellow);
                     bulletList.Remove(bulletList[i]);
                 }
                 else bulletList[i].Update();
             }
+        }
+
+        public void UpdateParticles(GameTime gameTime)
+        {
+            particleSystem.Update(gameTime);
         }
 
         public void DrawBullets(GraphicsDevice device, BoundingFrustum frustum)
@@ -189,14 +236,12 @@ namespace _3Dproject
 
         public void Draw(GraphicsDevice device, GameTime gameTime)
         {
-            Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
+            direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
-            Vector3 tankNormal = Game1.terrain.retTerrainNormal(position);
-            Vector3 tankRight = Vector3.Cross(direction, tankNormal);
-            TankR = tankRight;
-            Vector3 tankFront = Vector3.Cross(tankNormal, tankRight);
-            tankF = tankFront;
-            Matrix inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
+            tankNormal = Game1.terrain.retTerrainNormal(position);
+            tankRight = Vector3.Cross(direction, tankNormal);
+            tankFront = Vector3.Cross(tankNormal, tankRight);
+            inclinationMatrix = Matrix.CreateWorld(position, tankFront, tankNormal);
 
             tankModel.Root.Transform = Matrix.CreateRotationY(MathHelper.ToRadians(180)) * inclinationMatrix;
 
@@ -204,11 +249,36 @@ namespace _3Dproject
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
-            for (int i = 0; i < wheelsBones.Length; i++)
-                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];
-            for (int i = 0; i < steerBones.Length; i++)
-                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
+            if (!exploded)
+            {
+                for (int i = 0; i < wheelsBones.Length; i++)
+                    wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];
 
+                for (int i = 0; i < steerBones.Length; i++)
+                    steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
+            }
+            else
+            {
+                for (int i = 0; i < wheelsBones.Length; i++)
+                {
+                    wheelsBones[i].Transform = Matrix.CreateTranslation(WheelsDir[i]) * wheelsTransform[i];
+                    WheelsDir[i] += WheelsDir[i];
+                }
+                for (int i = 0; i < steerBones.Length; i++)
+                    steerBones[i].Transform = Matrix.CreateTranslation(WheelsDir[i]) * steerTransform[i];
+
+                if (position.Y >= Game1.terrain.retCameraHeight(position) - 1)
+                {
+                    position += TanKMid;
+                    TanKMid.Y -= 0.01f;
+                }
+                float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                remainingDelay -= timer;
+
+                if (remainingDelay <= 0)
+                    respawn = true;                  
+            }
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
             foreach (ModelMesh mesh in tankModel.Meshes)
@@ -238,15 +308,6 @@ namespace _3Dproject
             {
                 wheelsPos[i] = position + boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation * scale;
             }
-
-            //for (int x = 0; x < limitX; x++)
-            //{
-            //    for (int y = 0; y < limitZ; y++)
-            //    {
-            //        Vector3 a = new Vector3(x, Game1.terrain.retCameraHeight(new Vector3(x, 0, y)), y);
-            //        DrawVectors(device,a, a + Game1.terrain.retTerrainNormal(new Vector3(x, 0, y)), Color.White);
-            //    }
-            //}
 
             //Desenhar Particulas
             RightY = tankRight.Y;
@@ -301,8 +362,8 @@ namespace _3Dproject
             basicEffect.World = worldMatrix;
             basicEffect.VertexColorEnabled = true;
             basicEffect.CurrentTechnique.Passes[0].Apply();
-            //startPoint.Y += 5;
-            //endPoint.Y += 5;
+            startPoint.Y += 4;
+            endPoint.Y += 4;
             VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
             device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }

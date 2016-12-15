@@ -16,9 +16,10 @@ namespace _3Dproject
         private const float delay = 2.5f;
         private float remainingDelay = delay;
         private bool canFire = false;
-        private float speed , prevYaw = 0f;        
+        private float speed , prevYaw = 0f;
+        Vector3 aux = Vector3.Backward;
 
-        public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys) : base(device, content, _position, _id, _movementKeys)
+        public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys, bool _isBot) : base(device, content, _position, _id, _movementKeys, _isBot)
         {
             speed = 0.2f;
         }
@@ -40,17 +41,13 @@ namespace _3Dproject
 
             //Calcular o pitch do canhão dependendo da direçao e do pitch do tank
             float directionAngle = Math.Abs(direction.Y) / direction.Y * MathHelper.ToDegrees((float)Math.Acos((double)(new Vector3(direction.X,0,direction.Z).Length()/direction.Length())));
-            float frontAngle = Math.Abs(tankF.Y)/tankF.Y * MathHelper.ToDegrees((float)Math.Acos((double)(new Vector3(tankF.X, 0, tankF.Z).Length() / tankF.Length())));
+            float frontAngle = Math.Abs(tankFront.Y)/tankFront.Y * MathHelper.ToDegrees((float)Math.Acos((double)(new Vector3(tankFront.X, 0, tankFront.Z).Length() / tankFront.Length())));
 
-            canonPitch = directionAngle-frontAngle;
+            canonPitch = directionAngle - frontAngle;
 
             direction *= speed;
 
-            float tankYaw = Game1.TankList[0].returnYaw();
-
-            tankF = Vector3.Backward;
-
-            float angle = MathHelper.ToDegrees((float)Math.Acos((tankF.X * distance.X + tankF.Y * distance.Y + tankF.Z * distance.Z) / (tankF.Length() * distance.Length())));
+            float angle = MathHelper.ToDegrees((float)Math.Acos((aux.X * distance.X + aux.Y * distance.Y + aux.Z * distance.Z) / (aux.Length() * distance.Length())));
 
             if (otherTank.X <= position.X)            
                 angle = 360f - angle;
@@ -91,7 +88,7 @@ namespace _3Dproject
 
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
-            canonPitch = MathHelper.Clamp(canonPitch, -20, 90);
+            canonPitch = MathHelper.Clamp(canonPitch, -40, 90);
 
             position.X = MathHelper.Clamp(position.X, Sphere.Radius, limitX - Sphere.Radius);
             position.Z = MathHelper.Clamp(position.Z, Sphere.Radius, limitZ - Sphere.Radius);
@@ -100,8 +97,6 @@ namespace _3Dproject
 
             position.Y = minHeight;
 
-            //Update Particulas
-            particleSystem.Update(gameTime);
             directionClamp();
         }
 

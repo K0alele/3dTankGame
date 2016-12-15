@@ -67,7 +67,7 @@ namespace _3Dproject
             for (int i = 0; i < quant; i++)
             {
                 if (particles.Count < maxAmount)
-                    particles.Add(new Particle(pos, dir,Up, Right, random, color));
+                    particles.Add(new Particle(pos, dir, Up, Right, random, color));
                 else break;
             }
         }
