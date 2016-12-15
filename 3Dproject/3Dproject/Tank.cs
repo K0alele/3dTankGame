@@ -62,30 +62,22 @@ namespace _3Dproject
         protected PSystem particleSystem;
         protected Vector3[] wheelsPos;
         protected float RightY;
-        protected Vector3 direction = Vector3.Zero;
+
         protected Vector3 tankNormal = Vector3.Zero;
         protected Vector3 tankRight = Vector3.Zero;
         protected Vector3 tankFront = Vector3.Zero;
         protected Matrix inclinationMatrix;
 
-        Random rand;
-        Vector3[] WheelsDir;
-        Vector3 TanKMid;
-        private bool exploded = false;
         private bool respawn = false;
         private bool isBot;
 
-        private const float delay = 3f;
-        private float remainingDelay = delay;
-
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys, bool _isBot)
         {
-            rand = new Random();
             isBot = _isBot;
             scale = 0.01f;
             position = _position;
             wheelsPos = new Vector3[wheelNames.Length];
-            WheelsDir = new Vector3[wheelNames.Length];
+
             //TEST
             basicEffect = new BasicEffect(device);
             //TEST
@@ -153,23 +145,6 @@ namespace _3Dproject
             return false;
         }        
 
-        public void GotHit()
-        {
-            HP -= 40;
-
-            if (HP <= 0)
-            {
-                exploded = true;
-                TanKMid = Vector3.Up / 2;
-                for (int i = 0; i < wheelNames.Length; i++)
-                {
-                    WheelsDir[i] = wheelsPos[i] - position;
-                    WheelsDir[i] = Vector3.Transform(WheelsDir[i], Matrix.CreateFromAxisAngle(tankNormal, (float)-rand.NextDouble() * 20 + (float)rand.NextDouble() * 20));
-                }
-                particleSystem.FireParticles(position, tankNormal, tankNormal * 2, tankRight, 1000, Color.Yellow);
-            }
-        }
-
         public Vector3 returnPosition()
         {
             return position;
@@ -178,10 +153,7 @@ namespace _3Dproject
         {
             return TankYaw;
         }
-        public bool isAlive()
-        {
-            return !exploded;
-        }
+
         public bool Respawn()
         {
             return respawn;
@@ -203,6 +175,17 @@ namespace _3Dproject
         public virtual void Update(GameTime gameTime)
         {
 
+        }
+
+        public void GotHit()
+        {
+            HP -= 40;
+
+            if (HP <= 0)
+            {
+                particleSystem.FireParticles(position, tankNormal, tankNormal, tankRight, 1000, Color.Yellow);
+                respawn = true;
+            }
         }
 
         public void UpdateBullets()
@@ -234,9 +217,9 @@ namespace _3Dproject
                 item.Draw(device);
         }
 
-        public void Draw(GraphicsDevice device, GameTime gameTime)
+        public void Draw(GraphicsDevice device)
         {
-            direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
+            Vector3 direction = Vector3.Transform(new Vector3(1, 0, 0), Matrix.CreateRotationY(MathHelper.ToRadians(270 + TankYaw)));
 
             tankNormal = Game1.terrain.retTerrainNormal(position);
             tankRight = Vector3.Cross(direction, tankNormal);
@@ -249,36 +232,12 @@ namespace _3Dproject
             cannonBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(-canonPitch)) * cannonTransform;
             hatchBone.Transform = Matrix.CreateRotationX(MathHelper.ToRadians(hatchRotation)) * hatchtransform;
 
-            if (!exploded)
-            {
-                for (int i = 0; i < wheelsBones.Length; i++)
-                    wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];
+            for (int i = 0; i < wheelsBones.Length; i++)
+                wheelsBones[i].Transform = Matrix.CreateRotationX(MathHelper.ToRadians(wheelsRotation[i])) * wheelsTransform[i];
 
-                for (int i = 0; i < steerBones.Length; i++)
-                    steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
-            }
-            else
-            {
-                for (int i = 0; i < wheelsBones.Length; i++)
-                {
-                    wheelsBones[i].Transform = Matrix.CreateTranslation(WheelsDir[i]) * wheelsTransform[i];
-                    WheelsDir[i] += WheelsDir[i];
-                }
-                for (int i = 0; i < steerBones.Length; i++)
-                    steerBones[i].Transform = Matrix.CreateTranslation(WheelsDir[i]) * steerTransform[i];
+            for (int i = 0; i < steerBones.Length; i++)
+                steerBones[i].Transform = Matrix.CreateRotationY(MathHelper.ToRadians(steerYaw)) * steerTransform[i];
 
-                if (position.Y >= Game1.terrain.retCameraHeight(position) - 1)
-                {
-                    position += TanKMid;
-                    TanKMid.Y -= 0.01f;
-                }
-                float timer = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                remainingDelay -= timer;
-
-                if (remainingDelay <= 0)
-                    respawn = true;                  
-            }
             tankModel.CopyAbsoluteBoneTransformsTo(boneTransforms);
 
             foreach (ModelMesh mesh in tankModel.Meshes)
@@ -342,7 +301,7 @@ namespace _3Dproject
             //                    position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation - 1.8f * tankRight, Color.Violet); 
 
 
-            //DrawVectors(device, position + cannonPos, position + cannonPos + BulletTrajectory, Color.Green);
+            //DrawVectors(device, position + cannonPos + BulletTrajectory, position + cannonPos + BulletTrajectory * 3, Color.White);
             //DrawVectors(device, position, position + tankFront, Color.White);            
             //DrawVectors(device, position, position + direction, Color.HotPink);
             //DrawVectors(device, position, position + BulletTrajectory, Color.LightBlue);
@@ -362,8 +321,8 @@ namespace _3Dproject
             basicEffect.World = worldMatrix;
             basicEffect.VertexColorEnabled = true;
             basicEffect.CurrentTechnique.Passes[0].Apply();
-            startPoint.Y += 4;
-            endPoint.Y += 4;
+            //startPoint.Y += 4;
+            //endPoint.Y += 4;
             VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
             device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
         }

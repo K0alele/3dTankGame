@@ -49,7 +49,7 @@ namespace _3Dproject
 
             float angle = MathHelper.ToDegrees((float)Math.Acos((aux.X * distance.X + aux.Y * distance.Y + aux.Z * distance.Z) / (aux.Length() * distance.Length())));
 
-            if (otherTank.X <= position.X)            
+            if (otherTank.X < position.X)            
                 angle = 360f - angle;
 
             prevYaw = TankYaw;
@@ -61,14 +61,10 @@ namespace _3Dproject
             if (Math.Abs(prevYaw - TankYaw) <= 1 && Math.Abs(prevYaw - TankYaw) >= 0)            
                 mult = Math.Abs(prevYaw - TankYaw);                
 
-            if (prevYaw < TankYaw)
-            {
-                steerYaw += mult;
-            }
-            else if (prevYaw > TankYaw)
-            {
+            if (prevYaw < TankYaw)           
+                steerYaw += mult;          
+            else if (prevYaw > TankYaw)           
                 steerYaw -=  mult;
-            }
 
             if (distance.Length() >= 20 && !col)
             {

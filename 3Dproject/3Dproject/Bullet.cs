@@ -84,7 +84,7 @@ namespace _3Dproject
                         float B = (item.Sphere.Center - prevPosition).Length();
                         float C = (prevPosition - position).Length();
 
-                        float sp = (A + B + C) / 2;
+                        float sp = (A + B + C) * 0.5f;
 
                         float area = (float)Math.Sqrt(sp * (sp - A) * (sp - B) *(sp - C));
 

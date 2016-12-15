@@ -94,8 +94,8 @@ namespace _3Dproject
        
         public Vector3 retTerrainNormal(Vector3 P)
         {
-            if (P.X >= 0 && P.X <= Width - 1 && P.Z >= 0 && P.Z <= Height - 1)
-            {
+            //if (P.X >= 0 && P.X <= Width - 1 && P.Z >= 0 && P.Z <= Height - 1)
+            //{
                 Vector3 UpLeft = NormalData[(int)P.X, (int)P.Z];
                 Vector3 UpRight = NormalData[(int)P.X + 1, (int)P.Z];
                 Vector3 BotLeft = NormalData[(int)P.X, (int)P.Z + 1];
@@ -105,8 +105,8 @@ namespace _3Dproject
                 float dY = 1 - (P.Z - (int)P.Z);
 
                 return UpLeft * dX * dY + UpRight * dY * (1 - dX) + BotLeft * dX * (1 - dY) + BotRight * (1 - dX) * (1 - dY);
-            }
-            return Vector3.Up;
+            //}
+            //return Vector3.Up;
         }
 
         private void CreateGeometry(GraphicsDevice device)

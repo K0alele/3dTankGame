@@ -94,23 +94,18 @@ namespace _3Dproject
                 for (int i = 0; i < TankList.Count; i++)
                 {
                     TankList[i].UpdateParticles(gameTime);
-                    if (TankList[i].isAlive())
-                    {
-                        TankList[i].Update(gameTime);
-                    }
-                    else
-                    {
-                        if (TankList[i].Respawn())
-                        {
-                            bool isBot = TankList[i].IsBot();
-                            TankList[i] = CreateTanks(isBot); 
-                        }
-                    }                   
-                }         
 
+                    TankList[i].Update(gameTime);
+
+                    if (TankList[i].Respawn())
+                    {
+                        bool isBot = TankList[i].IsBot();
+                        TankList[i] = CreateTanks(isBot);
+                    }
+                }                                            
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);
-            }                             
+            }                                         
         }
 
         protected override void Draw(GameTime gameTime)
@@ -122,7 +117,7 @@ namespace _3Dproject
             TankList[0].DrawBullets(GraphicsDevice, frustum);
 
             foreach (var item in visible)
-                item.Draw(GraphicsDevice, gameTime);
+                item.Draw(GraphicsDevice);
 
             base.Draw(gameTime);              
         }
