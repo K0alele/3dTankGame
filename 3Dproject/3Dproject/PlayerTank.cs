@@ -17,7 +17,7 @@ namespace _3Dproject
         private float remainingDelay = delay;
         private bool canFire = true;
 
-        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys, bool _isBot) : base(device, content, _position,_id ,_movementKeys, _isBot)
+        public PlayerTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id,Keys[] _movementKeys) : base(device, content, _position,_id ,_movementKeys)
         {
 
         }
@@ -83,7 +83,6 @@ namespace _3Dproject
                 direction.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
-                directionClamp();
                 particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1, new Color(128, 57, 9));
             }
 
@@ -93,7 +92,6 @@ namespace _3Dproject
                 direction.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
-                directionClamp();
                 particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .75f, new Color(128, 57, 9));
             }
 
@@ -115,14 +113,23 @@ namespace _3Dproject
                 particleSystem.FireParticles(position + cannonPos + BulletTrajectory*2, BulletTrajectory, tankNormal, tankRight, 500, Color.Yellow);
                 canFire = false;
                 remainingDelay = delay;
-            }
-
-            float minHeight = Game1.terrain.retCameraHeight(position);
+            }            
 
             bool col = collides(position + direction);
 
             if (!col)
                 position += direction;
+
+            variablesConstrains();
+        }        
+
+        private void variablesConstrains()
+        {
+            if (steerYaw > 30)
+                steerYaw -= 10f;
+            else if (steerYaw < -30)
+                steerYaw += 10f;
+            else MathHelper.Clamp(steerYaw, -29, 29);
 
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
@@ -131,16 +138,9 @@ namespace _3Dproject
             position.X = MathHelper.Clamp(position.X, Sphere.Radius, limitX - Sphere.Radius);
             position.Z = MathHelper.Clamp(position.Z, Sphere.Radius, limitZ - Sphere.Radius);
 
-            position.Y = minHeight;
-        }        
+            float minHeight = Game1.terrain.retCameraHeight(position);
 
-        private void directionClamp()
-        {
-            if (steerYaw > 30)
-                steerYaw -= 10f;
-            else if (steerYaw < -30)
-                steerYaw += 10f;
-            else MathHelper.Clamp(steerYaw, -29, 29);
+            position.Y = minHeight;
         }
     }
 }

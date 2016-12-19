@@ -19,7 +19,7 @@ namespace _3Dproject
         private float speed , prevYaw = 0f;
         Vector3 aux = Vector3.Backward;
 
-        public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys, bool _isBot) : base(device, content, _position, _id, _movementKeys, _isBot)
+        public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys) : base(device, content, _position, _id, _movementKeys)
         {
             speed = 0.2f;
         }
@@ -49,7 +49,7 @@ namespace _3Dproject
 
             float angle = MathHelper.ToDegrees((float)Math.Acos((aux.X * distance.X + aux.Y * distance.Y + aux.Z * distance.Z) / (aux.Length() * distance.Length())));
 
-            if (otherTank.X < position.X)            
+            if (otherTank.X <= position.X)            
                 angle = 360f - angle;
 
             prevYaw = TankYaw;
@@ -81,6 +81,17 @@ namespace _3Dproject
             }            
 
             wheelYaw = new float[] { steerYaw + TankYaw, steerYaw + TankYaw, TankYaw, TankYaw };
+          
+            variablesConstrains();
+        }
+
+        private void variablesConstrains()
+        {
+            if (steerYaw > 30)
+                steerYaw -= 10f;
+            else if (steerYaw < -30)
+                steerYaw += 10f;
+            else MathHelper.Clamp(steerYaw, -29, 29);
 
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
@@ -92,17 +103,6 @@ namespace _3Dproject
             float minHeight = Game1.terrain.retCameraHeight(position);
 
             position.Y = minHeight;
-
-            directionClamp();
-        }
-
-        private void directionClamp()
-        {
-            if (steerYaw > 30)
-                steerYaw -= 10f;
-            else if (steerYaw < -30)
-                steerYaw += 10f;
-            else MathHelper.Clamp(steerYaw, -29, 29);
         }
     }
 }

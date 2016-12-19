@@ -38,18 +38,19 @@ namespace _3Dproject
         Matrix[] boneTransforms;
 
         protected float scale, steerMult = 1, HP = 100;
-        protected float turretYaw = 0f;
-        protected float canonPitch = 0f;
+        protected float turretYaw;
+        protected float canonPitch;
 
         string[] wheelNames = { "l_front_wheel_geo", "r_front_wheel_geo", "l_back_wheel_geo", "r_back_wheel_geo" };
         string[] steerNames = { "r_steer_geo", "l_steer_geo" };
 
-        protected float TankYaw = 0f, steerYaw = 0, hatchRotation = 0;
+        protected float TankYaw, steerYaw , hatchRotation;
         protected float[] wheelsRotation;
         protected float[] wheelYaw;
         protected float limitZ, limitX;
 
         protected Vector3 position;
+        private Vector3 OriginalPos;
         protected Vector3 BulletTrajectory = Vector3.Zero;            
 
         protected static List<Bullet> bulletList;
@@ -69,13 +70,20 @@ namespace _3Dproject
         protected Matrix inclinationMatrix;
 
         private bool respawn = false;
-        private bool isBot;
 
-        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys, bool _isBot)
+        public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
         {
-            isBot = _isBot;
             scale = 0.01f;
             position = _position;
+            OriginalPos = _position;
+
+            turretYaw = 0;
+            canonPitch = 0;
+
+            TankYaw = 0;
+            steerYaw = 0;
+            hatchRotation = 0;
+
             wheelsPos = new Vector3[wheelNames.Length];
 
             //TEST
@@ -158,10 +166,6 @@ namespace _3Dproject
         {
             return respawn;
         }
-        public bool IsBot()
-        {
-            return isBot;
-        }
 
         public float[] addArrays(float[] a1, float[] a2)
         {
@@ -185,6 +189,16 @@ namespace _3Dproject
             {
                 particleSystem.FireParticles(position, tankNormal, tankNormal, tankRight, 1000, Color.Yellow);
                 respawn = true;
+
+                position = OriginalPos;
+
+                HP = 100;
+                turretYaw = 0;
+                canonPitch = 0;
+
+                TankYaw = 0;
+                steerYaw = 0;
+                hatchRotation = 0;
             }
         }
 
@@ -196,9 +210,8 @@ namespace _3Dproject
                 float minHeight = Game1.terrain.retCameraHeight(pos);
                 if (pos.Y <= minHeight || pos.X <= 0 || pos.X >= limitX || pos.Z <= 0 || pos.Z >= limitZ || bulletList[i].hit)
                 {
-                    Vector3 bullPos = bulletList[i].returnPosition();
-                    Vector3 terrNorm = Game1.terrain.retTerrainNormal(bullPos);
-                    particleSystem.FireParticles(bullPos, terrNorm , terrNorm ,Vector3.Right, 500, Color.Yellow);
+                    Vector3 terrNorm = Game1.terrain.retTerrainNormal(bulletList[i].returnPosition());
+                    particleSystem.FireParticles(bulletList[i].returnPosition(), terrNorm , terrNorm ,Vector3.Right, 500, Color.Yellow);
                     bulletList.Remove(bulletList[i]);
                 }
                 else bulletList[i].Update();
@@ -272,12 +285,10 @@ namespace _3Dproject
             RightY = tankRight.Y;
             particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
 
-            //for (int i=0;i<4;i++)
+            //for (int i = 0; i < 4; i++)
             //    DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
 
-
             //TEST
-
             //DrawVectors(device, position, position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw + TankYaw)),
             //                                                     scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Y - 1.8f * tankRight.Y,
             //                                                     scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw + TankYaw))),
@@ -299,7 +310,6 @@ namespace _3Dproject
 
             //DrawVectors(device, position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation,
             //                    position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation - 1.8f * tankRight, Color.Violet); 
-
 
             //DrawVectors(device, position + cannonPos + BulletTrajectory, position + cannonPos + BulletTrajectory * 3, Color.White);
             //DrawVectors(device, position, position + tankFront, Color.White);            

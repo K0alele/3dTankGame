@@ -40,8 +40,7 @@ namespace _3Dproject
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<Tank>();
             TankList.Add(CreateTanks(false));
-            TankList.Add(CreateTanks(true)); 
-            //TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(10, 0, 400), 1, null));
+            TankList.Add(CreateTanks(true));             
 
             visible = new List<Tank>();
 
@@ -62,18 +61,15 @@ namespace _3Dproject
         private Tank CreateTanks(bool bot)
         {
             if (bot)
-                return new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1, new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }, bot);
+                return new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1, new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter });
             else
-                return new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0, new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }, bot);                                    
+                return new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0, new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space });                                    
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
-            frustum = new BoundingFrustum(MainCamera.viewMatrix * MainCamera.projectionMatrix);
-            visible = TankList.Where(m => frustum.Contains(m.Sphere) != ContainmentType.Disjoint).ToList();
+                Exit();            
 
             if (Keyboard.GetState().IsKeyDown(Keys.P) && canPress)
             {
@@ -87,22 +83,22 @@ namespace _3Dproject
                 MouseState mouseState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mouseState.X, mouseState.Y);                               
 
-                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue, new[] {TankList[0].returnPosition(), TankList[1].returnPosition()});
+                MainCamera.Update(mousePos, half, mouseState.ScrollWheelValue);
 
-                TankList[0].UpdateBullets();
+                if (TankList.ElementAtOrDefault(0) != null)
+                    TankList[0].UpdateBullets();
+                else if (TankList.ElementAtOrDefault(1) != null)                
+                    TankList[0].UpdateBullets();
 
                 for (int i = 0; i < TankList.Count; i++)
                 {
-                    TankList[i].UpdateParticles(gameTime);
-
                     TankList[i].Update(gameTime);
+                    TankList[i].UpdateParticles(gameTime);
+                }
 
-                    if (TankList[i].Respawn())
-                    {
-                        bool isBot = TankList[i].IsBot();
-                        TankList[i] = CreateTanks(isBot);
-                    }
-                }                                            
+                frustum = new BoundingFrustum(MainCamera.viewMatrix * MainCamera.projectionMatrix);
+                visible = TankList.Where(m => frustum.Contains(m.Sphere) != ContainmentType.Disjoint).ToList();
+
                 Mouse.SetPosition((int)half.X, (int)half.Y);
                 base.Update(gameTime);
             }                                         
@@ -114,8 +110,11 @@ namespace _3Dproject
 
             terrain.Draw(GraphicsDevice);
 
-            TankList[0].DrawBullets(GraphicsDevice, frustum);
-
+            if (TankList.ElementAtOrDefault(0) != null)            
+                TankList[0].DrawBullets(GraphicsDevice, frustum);
+            else if (TankList.ElementAtOrDefault(1) != null)            
+                TankList[1].DrawBullets(GraphicsDevice, frustum);            
+                              
             foreach (var item in visible)
                 item.Draw(GraphicsDevice);
 
