@@ -83,6 +83,7 @@ namespace _3Dproject
                 direction.Z += (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.5f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { 10f, 10f, 10f, 10f });
                 steerMult = 1f;
+                directionClamp();
                 particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, 1, new Color(128, 57, 9));
             }
 
@@ -92,6 +93,7 @@ namespace _3Dproject
                 direction.Z -= (float)Math.Cos(MathHelper.ToRadians(TankYaw)) * 0.2f;
                 wheelsRotation = addArrays(wheelsRotation, new float[] { -5f, -5f, -5f, -5f });
                 steerMult = -1f;
+                directionClamp();
                 particleSystem.CreateParticles(wheelsPos, RightY, wheelYaw, steerMult, .75f, new Color(128, 57, 9));
             }
 
@@ -120,17 +122,6 @@ namespace _3Dproject
             if (!col)
                 position += direction;
 
-            variablesConstrains();
-        }        
-
-        private void variablesConstrains()
-        {
-            if (steerYaw > 30)
-                steerYaw -= 10f;
-            else if (steerYaw < -30)
-                steerYaw += 10f;
-            else MathHelper.Clamp(steerYaw, -29, 29);
-
             hatchRotation = MathHelper.Clamp(hatchRotation, 0, 90);
 
             canonPitch = MathHelper.Clamp(canonPitch, -40, 90);
@@ -141,6 +132,15 @@ namespace _3Dproject
             float minHeight = Game1.terrain.retCameraHeight(position);
 
             position.Y = minHeight;
+        }        
+
+        private void directionClamp()
+        {
+            if (steerYaw > 30)
+                steerYaw -= 10f;
+            else if (steerYaw < -30)
+                steerYaw += 10f;
+            else MathHelper.Clamp(steerYaw, -29, 29);            
         }
     }
 }
