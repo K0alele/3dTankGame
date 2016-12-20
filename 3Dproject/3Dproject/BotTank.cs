@@ -17,7 +17,6 @@ namespace _3Dproject
         private float remainingDelay = delay;
         private bool canFire = false;
         private float speed , prevYaw = 0f;
-        Vector3 aux = Vector3.Backward;
 
         public BotTank(GraphicsDevice device, ContentManager content, Vector3 _position, int _id, Keys[] _movementKeys) : base(device, content, _position, _id, _movementKeys)
         {

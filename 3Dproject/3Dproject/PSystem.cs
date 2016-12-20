@@ -13,23 +13,23 @@ namespace _3Dproject
     public class PSystem
     {
         private BasicEffect effect;
-
-        private float raio;
+        
         private int amount, maxAmount;
 
         private Random random = new Random();
         private List<Particle> particles;
         private Matrix worldMatrix;
 
+        private VertexPositionColor[] vertices;
         private Color particleColor;
 
-        public PSystem(GraphicsDevice device ,float _raio, int _quant, int _quantMax, Color _color)
+        public PSystem(GraphicsDevice device, int _quant, int _quantMax, Color _color)
         {
-
-            raio = _raio;
             amount = _quant; //quantidade de particulas criadas por update
             particleColor = _color;
             maxAmount = _quantMax; //maxima quantidade de particulas
+
+            vertices = new VertexPositionColor[maxAmount * 2];
 
             effect = new BasicEffect(device);
 
@@ -81,8 +81,6 @@ namespace _3Dproject
                 effect.World = worldMatrix;
 
                 effect.CurrentTechnique.Passes[0].Apply();
-
-                VertexPositionColor[] vertices = new VertexPositionColor[particles.Count * 2];
 
                 for (int i = 0; i < particles.Count; i++)
                 {
