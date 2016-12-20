@@ -47,10 +47,11 @@ namespace _3Dproject
 
             direction *= speed;
 
-            float angle = MathHelper.ToDegrees((float)Math.Acos((aux.X * distance.X + aux.Y * distance.Y + aux.Z * distance.Z) / (aux.Length() * distance.Length())));
 
-            if (otherTank.X <= position.X)            
-                angle = 360f - angle;
+            float angle = MathHelper.ToDegrees((float)Math.Asin((double)(direction.X / new Vector3(direction.X, 0, direction.Z).Length())));
+
+            if (direction.Z < 0) angle = 180 - angle;
+
 
             prevYaw = TankYaw;
             TankYaw = angle;
