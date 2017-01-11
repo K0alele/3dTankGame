@@ -5,9 +5,13 @@ using System.Collections.Generic;
 public class Launcher : MonoBehaviour
 {
     [SerializeField]
-    private float force = 100.0f;
+    private float forceMin = 20.0f;
+    [SerializeField]
+    private float forceMax = 60.0f;
     [SerializeField]
     private string buttonName = "Fire1";
+    [SerializeField]
+    private bool velocityConstraint = false;
 
     //Lista de bolas no trigger
     private List<Rigidbody> list;
@@ -19,9 +23,17 @@ public class Launcher : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown(buttonName))        
-            foreach (Rigidbody ball in list)                     
-                ball.AddForce(Vector3.forward * force, ForceMode.VelocityChange);                   
+        if (buttonName != "none")
+        {
+            if (Input.GetButtonDown(buttonName))
+                foreach (Rigidbody ball in list)
+                    ball.AddForce(Vector3.forward * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+        }
+        else if (buttonName == "none" && !velocityConstraint)
+        {
+            foreach (Rigidbody ball in list)
+                ball.AddForce(Vector3.forward * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+        }                                     
     }
 
     void OnTriggerEnter(Collider col)

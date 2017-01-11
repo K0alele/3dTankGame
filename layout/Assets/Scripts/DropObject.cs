@@ -2,18 +2,23 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(ScoreManager))]
 public class DropObject : MonoBehaviour
 {
     [SerializeField]
     private float dropDistance = 1.0f;
     [SerializeField]
-    private int bankID = 0;
+    private int groupID = 0;
     [SerializeField]
     private float resetDelay = 0.5f;
     [SerializeField]
     private static List<DropObject> dropTargets = new List<DropObject>();
     [SerializeField]
     private bool isDropped = false;
+    [SerializeField]
+    private int value = 100;
+    [SerializeField]
+    private int AllValue = 1000;
 
     void Start()
     {
@@ -33,24 +38,29 @@ public class DropObject : MonoBehaviour
             transform.position += Vector3.down * dropDistance;
             isDropped = true;
 
+            ScoreManager.score += value;
+
             //Se os seus "parceiros" cairam
-            bool resetBank = true;
+            bool resetGroup = true;
             foreach (DropObject target in dropTargets)
-                if (target.returnId() == bankID)
+                if (target.returnId() == groupID)
                     if (!target.returnState())
-                        resetBank = false;
+                        resetGroup = false;
 
             //Delayed reset
-            if (resetBank)            
-                Invoke("ResetBank", resetDelay);            
+            if (resetGroup)
+            {
+                ScoreManager.score += AllValue;
+                Invoke("ResetGroup", resetDelay);
+            }         
         }
     }
 
-    void ResetBank()
+    void ResetGroup()
     {
         foreach (DropObject target in dropTargets)
         {
-            if (target.returnId() == bankID)
+            if (target.returnId() == groupID)
             {
                 target.transform.position += Vector3.up * dropDistance;
                 target.isDropped = false;
@@ -59,7 +69,7 @@ public class DropObject : MonoBehaviour
     }
     public int returnId()
     {
-        return bankID;
+        return groupID;
     }
     public bool returnState()
     {
