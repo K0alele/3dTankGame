@@ -39,8 +39,8 @@ namespace _3Dproject
 
             terrain = new Terrain(GraphicsDevice, Content, 16f);
             TankList = new List<Tank>();
-            TankList.Add(CreateTanks(false));
-            TankList.Add(CreateTanks(true));             
+            TankList.Add(new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0, new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space }));
+            TankList.Add(new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1, new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter }));             
 
             visible = new List<Tank>();
 
@@ -56,14 +56,6 @@ namespace _3Dproject
         protected override void UnloadContent()
         {
 
-        }
-
-        private Tank CreateTanks(bool bot)
-        {
-            if (bot)
-                return new BotTank(GraphicsDevice, Content, new Vector3(400, 0, 400), 1, new[] { Keys.J, Keys.L, Keys.I, Keys.K, Keys.Enter });
-            else
-                return new PlayerTank(GraphicsDevice, Content, new Vector3(10, 0, 10), 0, new[] { Keys.A, Keys.D, Keys.W, Keys.S, Keys.Space });                                    
         }
 
         protected override void Update(GameTime gameTime)

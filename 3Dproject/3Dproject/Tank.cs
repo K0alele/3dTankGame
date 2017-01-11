@@ -13,10 +13,6 @@ namespace _3Dproject
 {
     public class Tank
     {
-        //TESTE
-        BasicEffect basicEffect;
-        //TESTE
-
         protected BasicEffect effect;
 
         Model tankModel;
@@ -69,8 +65,6 @@ namespace _3Dproject
         protected Vector3 tankFront = Vector3.Zero;
         protected Matrix inclinationMatrix;
 
-        private bool respawn = false;
-
         public Tank(GraphicsDevice device, ContentManager content, Vector3 _position,int _id ,Keys[] _movementKeys)
         {
             scale = 0.01f;
@@ -85,10 +79,6 @@ namespace _3Dproject
             hatchRotation = 0;
 
             wheelsPos = new Vector3[wheelNames.Length];
-
-            //TEST
-            basicEffect = new BasicEffect(device);
-            //TEST
 
             ID = _id;
             movementKeys = _movementKeys;
@@ -162,11 +152,6 @@ namespace _3Dproject
             return TankYaw;
         }
 
-        public bool Respawn()
-        {
-            return respawn;
-        }
-
         public float[] addArrays(float[] a1, float[] a2)
         {
             float[] result = new float[a1.Length];
@@ -188,7 +173,6 @@ namespace _3Dproject
             if (HP <= 0)
             {
                 particleSystem.FireParticles(position, tankNormal, tankNormal, tankRight, 1000, Color.Yellow);
-                respawn = true;
 
                 position = OriginalPos;
 
@@ -266,7 +250,7 @@ namespace _3Dproject
                     effect.DirectionalLight0.DiffuseColor = new Vector3(1f, 1f, 1f);
                     effect.DirectionalLight0.Direction = new Vector3(.5f, -1f, 0);
                 }
-                //mesh.Draw();
+                mesh.Draw();
             }
 
             BulletTrajectory = Vector3.Transform(tankFront, Matrix.CreateFromAxisAngle(tankRight,
@@ -283,61 +267,7 @@ namespace _3Dproject
 
             //Desenhar Particulas
             RightY = tankRight.Y;
-            particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);
-
-            for (int i = 0; i < 4; i++)
-                DrawVectors(device, position, position + scale * boneTransforms[tankModel.Meshes[wheelNames[i]].ParentBone.Index].Translation, Color.White);
-
-            //TEST
-            DrawVectors(device, position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation,
-                                          position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw + TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Y - 1.8f * tankRight.Y,
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw + TankYaw))),
-                                                                 Color.Red);
-
-            DrawVectors(device, position +scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation,
-                                          position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.X - 1.5f * (float)Math.Cos(MathHelper.ToRadians(steerYaw + TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.Y + 1.8f * tankRight.Y,
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[1]].ParentBone.Index].Translation.Z + 1.5f * (float)Math.Sin(MathHelper.ToRadians(steerYaw + TankYaw))),
-                                                                 Color.Yellow);
-            DrawVectors(device, position +scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation,
-                                          position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.X - 1.5f * (float)Math.Cos(MathHelper.ToRadians(TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.Y + 1.8f * tankRight.Y,
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[2]].ParentBone.Index].Translation.Z + 1.5f * (float)Math.Sin(MathHelper.ToRadians(TankYaw))),
-                                                                 Color.Blue);
-            DrawVectors(device, position +scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation,
-                                          position + new Vector3(scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.X + 1.5f * (float)Math.Cos(MathHelper.ToRadians(TankYaw)),
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.Y - 1.8f * tankRight.Y,
-                                                                 scale * boneTransforms[tankModel.Meshes[wheelNames[3]].ParentBone.Index].Translation.Z - 1.5f * (float)Math.Sin(MathHelper.ToRadians(TankYaw))),
-                                                                 Color.Green);
-
-            //DrawVectors(device, position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation,
-            //                    position + scale * boneTransforms[tankModel.Meshes[wheelNames[0]].ParentBone.Index].Translation - 1.8f * tankRight, Color.Violet); 
-
-            //DrawVectors(device, position + cannonPos + BulletTrajectory, position + cannonPos + BulletTrajectory * 3, Color.White);
-            //DrawVectors(device, position, position + tankFront, Color.White);            
-            //DrawVectors(device, position, position + direction, Color.HotPink);
-            //DrawVectors(device, position, position + BulletTrajectory, Color.LightBlue);
-            //DrawVectors(device, position, position + new Vector3(raio, 0, 0), Color.HotPink);
-            //DrawVectors(device, position, position + new Vector3(-raio, 0, 0), Color.HotPink);
-            //DrawVectors(device, position, position + new Vector3(0, raio, 0), Color.HotPink);
-            //DrawVectors(device, position, position + new Vector3(0, -raio, 0), Color.HotPink);
-            //DrawVectors(device, position, position + new Vector3(0, 0, raio), Color.HotPink);
-            //DrawVectors(device, position, position + new Vector3(0, 0, -raio), Color.HotPink);
-            //TEST
-        }
-
-        public void DrawVectors(GraphicsDevice device, Vector3 startPoint, Vector3 endPoint, Color color)
-        {
-            basicEffect.Projection = Game1.MainCamera.projectionMatrix;
-            basicEffect.View = Game1.MainCamera.viewMatrix;
-            basicEffect.World = worldMatrix;
-            basicEffect.VertexColorEnabled = true;
-            basicEffect.CurrentTechnique.Passes[0].Apply();
-            //startPoint.Y += 4;
-            //endPoint.Y += 4;
-            VertexPositionColor[] vertices = new[] { new VertexPositionColor(startPoint, color), new VertexPositionColor(endPoint, color) };
-            device.DrawUserPrimitives(PrimitiveType.LineList, vertices, 0, 1);
+            particleSystem.Draw(device, Game1.MainCamera.viewMatrix, Game1.MainCamera.projectionMatrix);         
         }
     }
 }
