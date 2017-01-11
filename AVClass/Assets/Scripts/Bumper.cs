@@ -16,7 +16,8 @@ public class Bumper : MonoBehaviour {
         if (col.gameObject.GetComponent<Rigidbody>() != null)
         {
             ScoreManager.score += value;
-            col.gameObject.GetComponent<Rigidbody>().AddExplosionForce(force, transform.position, radius);        
+            col.gameObject.GetComponent<Rigidbody>().AddExplosionForce(force, transform.position, radius);
+            col.gameObject.GetComponent<Renderer>().material.color = Random.ColorHSV();
         }
     }
 }

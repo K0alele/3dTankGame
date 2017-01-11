@@ -31,6 +31,7 @@ public class ball : MonoBehaviour {
         if (rb.position.z <= zLimit)
         {
             rb.position = OriginalPos;
+            gameObject.GetComponent<Renderer>().material.color = Color.white;
             rb.velocity = Vector3.zero;
             lives--;
 
