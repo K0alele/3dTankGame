@@ -8,7 +8,7 @@ public class DropObject : MonoBehaviour
     [SerializeField]
     private float dropDistance = 1.0f;
     [SerializeField]
-    private int bankID = 0;
+    private int groupID = 0;
     [SerializeField]
     private float resetDelay = 0.5f;
     [SerializeField]
@@ -41,26 +41,26 @@ public class DropObject : MonoBehaviour
             ScoreManager.score += value;
 
             //Se os seus "parceiros" cairam
-            bool resetBank = true;
+            bool resetGroup = true;
             foreach (DropObject target in dropTargets)
-                if (target.returnId() == bankID)
+                if (target.returnId() == groupID)
                     if (!target.returnState())
-                        resetBank = false;
+                        resetGroup = false;
 
             //Delayed reset
-            if (resetBank)
+            if (resetGroup)
             {
                 ScoreManager.score += AllValue;
-                Invoke("ResetBank", resetDelay);
+                Invoke("ResetGroup", resetDelay);
             }         
         }
     }
 
-    void ResetBank()
+    void ResetGroup()
     {
         foreach (DropObject target in dropTargets)
         {
-            if (target.returnId() == bankID)
+            if (target.returnId() == groupID)
             {
                 target.transform.position += Vector3.up * dropDistance;
                 target.isDropped = false;
@@ -69,7 +69,7 @@ public class DropObject : MonoBehaviour
     }
     public int returnId()
     {
-        return bankID;
+        return groupID;
     }
     public bool returnState()
     {

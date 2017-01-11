@@ -251,7 +251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropDistance: 1
-  bankID: 0
+  groupID: 0
   resetDelay: 0.5
   isDropped: 0
   value: 100
@@ -1400,13 +1400,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1324703251}
-  m_LocalRotation: {x: -0.68054867, y: -0.19197272, z: -0.19197267, w: 0.6805487}
-  m_LocalPosition: {x: -13.6, y: 0.41, z: 2.67}
+  m_LocalRotation: {x: -0.6968278, y: -0.12012903, z: -0.12012898, w: 0.6968278}
+  m_LocalPosition: {x: -10.67, y: 0.41, z: 4.98}
   m_LocalScale: {x: 2.47, y: 34.26624, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 15
-  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: -31.506002}
+  m_LocalEulerAnglesHint: {x: -90.00001, y: 0, z: -19.563002}
 --- !u!1 &1347882268
 GameObject:
   m_ObjectHideFlags: 0
@@ -1438,7 +1438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropDistance: 1
-  bankID: 0
+  groupID: 0
   resetDelay: 0.5
   isDropped: 0
   value: 100

@@ -40,6 +40,7 @@ public class ball : MonoBehaviour {
         if (lives < 0)
         {
             display.text = "GAME OVER";
+            ScoreManager.score = 0;
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             //StartCoroutine(RestartLevel());
         }

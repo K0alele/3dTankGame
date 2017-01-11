@@ -19,9 +19,21 @@ public class Launcher : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown(buttonName))        
-            foreach (Rigidbody ball in list)                     
-                ball.AddForce(Vector3.forward * force, ForceMode.VelocityChange);                   
+        if (buttonName != "none")
+        {
+            if (Input.GetButtonDown(buttonName))
+                foreach (Rigidbody ball in list)
+                    ball.AddForce(Vector3.forward * force, ForceMode.VelocityChange);
+        }
+        else
+        {
+            foreach (Rigidbody ball in list)
+                ball.AddForce(Vector3.forward * force, ForceMode.VelocityChange);
+        }
+            
+        
+               
+                          
     }
 
     void OnTriggerEnter(Collider col)
