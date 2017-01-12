@@ -54,11 +54,8 @@ public class Launcher : MonoBehaviour
                 {
                     ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
                     PlaySound(0);
-                }
-
-                
-            }
-               
+                }              
+            }            
         }                                     
     }
 

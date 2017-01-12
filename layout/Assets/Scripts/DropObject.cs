@@ -59,13 +59,6 @@ public class DropObject : MonoBehaviour
         }
     }
 
-    void PlaySound(int clip)
-    {
-        GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
-        GetComponent<AudioSource>().clip = audioClip[clip];
-        GetComponent<AudioSource>().Play();
-    }
-
     void ResetGroup()
     {
         foreach (DropObject target in dropTargets)
@@ -77,6 +70,14 @@ public class DropObject : MonoBehaviour
             }
         }
     }
+
+    void PlaySound(int clip)
+    {
+        GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
+        GetComponent<AudioSource>().clip = audioClip[clip];
+        GetComponent<AudioSource>().Play();
+    }
+
     public int returnId()
     {
         return groupID;
