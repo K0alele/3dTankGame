@@ -22,6 +22,7 @@ public class ball : MonoBehaviour {
     private string buttonName = "Fire1";
 
     public AudioClip[] audioClip;
+    public bool canPlay = true;
 
     void Start ()
     {
@@ -37,8 +38,9 @@ public class ball : MonoBehaviour {
         {
             if (lives > 0)
             {
-                rb.position = OriginalPos;
-                PlaySound(0, true);
+                rb.position = OriginalPos;                               
+                PlaySound(0);
+                Debug.Log("PLAY");
             }           
             gameObject.GetComponent<Renderer>().material.color = Color.white;
             rb.velocity = Vector3.zero;
@@ -49,7 +51,13 @@ public class ball : MonoBehaviour {
         if (lives < 0)
         {
             display.text = "GAME OVER";
-            PlaySound(1,false);
+            GetComponent<AudioSource>().pitch = 1f;
+            if (canPlay)
+            {
+                PlaySound(1);
+                canPlay = false;
+            }
+            
             if (Input.GetButton(buttonName))
             {
                 ScoreManager.score = 0;                
@@ -60,12 +68,10 @@ public class ball : MonoBehaviour {
         }
     }
 
-    void PlaySound(int clip, bool random)
+    void PlaySound(int clip)
     {
-        if (random)        
-            GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
-        else        
-            GetComponent<AudioSource>().pitch = 1f;        
+        
+        GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
         GetComponent<AudioSource>().clip = audioClip[clip];
         GetComponent<AudioSource>().Play();
     }
