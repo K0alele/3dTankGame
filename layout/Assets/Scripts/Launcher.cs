@@ -27,12 +27,25 @@ public class Launcher : MonoBehaviour
         {
             if (Input.GetButtonDown(buttonName))
                 foreach (Rigidbody ball in list)
-                    ball.AddForce(Vector3.forward * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                {
+                    Quaternion rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+                    Vector3 myVector = Vector3.forward;
+                    Vector3 rotateVector = rotation * myVector;
+                    Debug.Log(rotateVector);
+                    ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                }                              
         }
         else if (buttonName == "none" && !velocityConstraint)
         {
             foreach (Rigidbody ball in list)
-                ball.AddForce(Vector3.forward * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+            {
+                Quaternion rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
+                Vector3 myVector = Vector3.forward;
+                Vector3 rotateVector = rotation * myVector;
+                Debug.Log(rotateVector);
+                ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+            }
+               
         }                                     
     }
 

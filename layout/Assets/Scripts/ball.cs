@@ -18,6 +18,9 @@ public class ball : MonoBehaviour {
 
     public float slowness = 10f;
 
+    [SerializeField]
+    private string buttonName = "Fire1";
+
     void Start ()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,7 +33,10 @@ public class ball : MonoBehaviour {
     {
         if (rb.position.z <= zLimit)
         {
-            rb.position = OriginalPos;
+            if (lives > 0)
+            {
+                rb.position = OriginalPos;
+            }           
             gameObject.GetComponent<Renderer>().material.color = Color.white;
             rb.velocity = Vector3.zero;
             lives--;
@@ -40,8 +46,13 @@ public class ball : MonoBehaviour {
         if (lives < 0)
         {
             display.text = "GAME OVER";
-            ScoreManager.score = 0;
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+            if (Input.GetButton(buttonName))
+            {
+                ScoreManager.score = 0;
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            }
+            
             //StartCoroutine(RestartLevel());
         }
     }

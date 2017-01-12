@@ -14,7 +14,7 @@ public class DropObject : MonoBehaviour
     [SerializeField]
     private static List<DropObject> dropTargets = new List<DropObject>();
     [SerializeField]
-    private bool isDropped = false;
+    private bool isDropped;
     [SerializeField]
     private int value = 100;
     [SerializeField]
@@ -23,6 +23,7 @@ public class DropObject : MonoBehaviour
     void Start()
     {
         dropTargets.Add(this);
+        isDropped = false;
     }
 
     void Update()
