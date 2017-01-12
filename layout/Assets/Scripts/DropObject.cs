@@ -20,6 +20,8 @@ public class DropObject : MonoBehaviour
     [SerializeField]
     private int AllValue = 1000;
 
+    public AudioClip[] audioClip;
+
     void Start()
     {
         dropTargets.Add(this);
@@ -40,7 +42,7 @@ public class DropObject : MonoBehaviour
             isDropped = true;
 
             ScoreManager.score += value;
-
+            PlaySound(0);
             //Se os seus "parceiros" cairam
             bool resetGroup = true;
             foreach (DropObject target in dropTargets)
@@ -55,6 +57,13 @@ public class DropObject : MonoBehaviour
                 Invoke("ResetGroup", resetDelay);
             }         
         }
+    }
+
+    void PlaySound(int clip)
+    {
+        GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
+        GetComponent<AudioSource>().clip = audioClip[clip];
+        GetComponent<AudioSource>().Play();
     }
 
     void ResetGroup()

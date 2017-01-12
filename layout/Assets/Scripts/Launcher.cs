@@ -13,12 +13,15 @@ public class Launcher : MonoBehaviour
     [SerializeField]
     private bool velocityConstraint = false;
 
+    public AudioClip[] audioClip;
+
     //Lista de bolas no trigger
     private List<Rigidbody> list;
 
     void Start()
     {
         list = new List<Rigidbody>();
+        
     }
 
     void Update()
@@ -31,22 +34,39 @@ public class Launcher : MonoBehaviour
                     Quaternion rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
                     Vector3 myVector = Vector3.forward;
                     Vector3 rotateVector = rotation * myVector;
-                    Debug.Log(rotateVector);
                     ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                    PlaySound(0);
                 }                              
         }
-        else if (buttonName == "none" && !velocityConstraint)
+        else if (buttonName == "none")
         {
             foreach (Rigidbody ball in list)
             {
                 Quaternion rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.z);
                 Vector3 myVector = Vector3.forward;
                 Vector3 rotateVector = rotation * myVector;
-                Debug.Log(rotateVector);
-                ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                if (velocityConstraint && ball.velocity.z > 0)
+                {
+                    ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                    PlaySound(0);
+                }
+                else if (!velocityConstraint)
+                {
+                    ball.AddForce(rotateVector.normalized * Random.Range(forceMin, forceMax), ForceMode.VelocityChange);
+                    PlaySound(0);
+                }
+
+                
             }
                
         }                                     
+    }
+
+    void PlaySound(int clip)
+    {
+        GetComponent<AudioSource>().pitch = Random.Range(0.6f, 1.4f);
+        GetComponent<AudioSource>().clip = audioClip[clip];
+        GetComponent<AudioSource>().Play();
     }
 
     void OnTriggerEnter(Collider col)
